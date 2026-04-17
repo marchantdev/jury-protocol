@@ -1,0 +1,7 @@
+Program ID: 4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15
+Cluster: devnet
+Explorer: https://explorer.solana.com/address/4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15?cluster=devnet
+Deploy tx: https://explorer.solana.com/tx/33swTRyk9qucDa9xpAaGsn88cqWMbpXJwQ9AQ4UXbw1S9Ma4kkceLH7bVyXkgvytDwQRepi3nxKEH5PsntXtsDFm?cluster=devnet
+
+Frontend: https://jury-app-eight.vercel.app
+Vercel deploy: https://jury-9ib8wlzio-marchantdevs-projects.vercel.app
