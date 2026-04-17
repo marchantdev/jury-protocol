@@ -1,0 +1,1184 @@
+{
+  "address": "4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15",
+  "metadata": {
+    "name": "jury_program",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "On-chain dispute resolution with VRF-backed jury selection"
+  },
+  "instructions": [
+    {
+      "name": "cast_vote",
+      "docs": [
+        "A selected juror casts their vote. 1=plaintiff, 2=defendant."
+      ],
+      "discriminator": [
+        20,
+        212,
+        15,
+        189,
+        69,
+        180,
+        69,
+        151
+      ],
+      "accounts": [
+        {
+          "name": "juror",
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "vote",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "claim_stakes",
+      "docs": [
+        "Winner claims the combined stakes."
+      ],
+      "discriminator": [
+        254,
+        140,
+        24,
+        53,
+        197,
+        234,
+        35,
+        121
+      ],
+      "accounts": [
+        {
+          "name": "winner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_dispute",
+      "docs": [
+        "Create a new dispute between two parties.",
+        "Both parties stake SOL; the loser forfeits their stake."
+      ],
+      "discriminator": [
+        161,
+        99,
+        53,
+        116,
+        60,
+        79,
+        149,
+        105
+      ],
+      "accounts": [
+        {
+          "name": "plaintiff",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "plaintiff"
+              },
+              {
+                "kind": "arg",
+                "path": "dispute_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "dispute_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "name": "stake_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "join_dispute",
+      "docs": [
+        "Defendant joins the dispute and stakes matching SOL."
+      ],
+      "discriminator": [
+        147,
+        120,
+        95,
+        90,
+        161,
+        231,
+        176,
+        183
+      ],
+      "accounts": [
+        {
+          "name": "defendant",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "request_jury",
+      "docs": [
+        "Request VRF randomness for jury selection."
+      ],
+      "discriminator": [
+        164,
+        150,
+        79,
+        133,
+        140,
+        104,
+        160,
+        62
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "random",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  111,
+                  45,
+                  118,
+                  114,
+                  102,
+                  45,
+                  114,
+                  97,
+                  110,
+                  100,
+                  111,
+                  109,
+                  110,
+                  101,
+                  115,
+                  115,
+                  45,
+                  114,
+                  101,
+                  113,
+                  117,
+                  101,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "vrf_seed"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                7,
+                71,
+                177,
+                26,
+                250,
+                145,
+                180,
+                209,
+                249,
+                34,
+                242,
+                123,
+                14,
+                186,
+                193,
+                218,
+                178,
+                59,
+                33,
+                41,
+                164,
+                190,
+                243,
+                79,
+                50,
+                164,
+                123,
+                88,
+                245,
+                206,
+                252,
+                120
+              ]
+            }
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "network_state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  111,
+                  45,
+                  118,
+                  114,
+                  102,
+                  45,
+                  110,
+                  101,
+                  116,
+                  119,
+                  111,
+                  114,
+                  107,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                  117,
+                  114,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                7,
+                71,
+                177,
+                26,
+                250,
+                145,
+                180,
+                209,
+                249,
+                34,
+                242,
+                123,
+                14,
+                186,
+                193,
+                218,
+                178,
+                59,
+                33,
+                41,
+                164,
+                190,
+                243,
+                79,
+                50,
+                164,
+                123,
+                88,
+                245,
+                206,
+                252,
+                120
+              ]
+            }
+          }
+        },
+        {
+          "name": "vrf",
+          "address": "VRFzZoJdhFWL8rkvu87LpKM3RbcVezpMEc6X5GVDr7y"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "vrf_seed",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "reveal_jury",
+      "docs": [
+        "Reveal the jury after VRF fulfillment."
+      ],
+      "discriminator": [
+        162,
+        179,
+        151,
+        166,
+        125,
+        98,
+        181,
+        131
+      ],
+      "accounts": [
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "random",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  111,
+                  45,
+                  118,
+                  114,
+                  102,
+                  45,
+                  114,
+                  97,
+                  110,
+                  100,
+                  111,
+                  109,
+                  110,
+                  101,
+                  115,
+                  115,
+                  45,
+                  114,
+                  101,
+                  113,
+                  117,
+                  101,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.vrf_seed",
+                "account": "Dispute"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                7,
+                71,
+                177,
+                26,
+                250,
+                145,
+                180,
+                209,
+                249,
+                34,
+                242,
+                123,
+                14,
+                186,
+                193,
+                218,
+                178,
+                59,
+                33,
+                41,
+                164,
+                190,
+                243,
+                79,
+                50,
+                164,
+                123,
+                88,
+                245,
+                206,
+                252,
+                120
+              ]
+            }
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "juror_pool",
+          "type": {
+            "array": [
+              "pubkey",
+              9
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Dispute",
+      "discriminator": [
+        36,
+        49,
+        241,
+        67,
+        40,
+        36,
+        241,
+        74
+      ]
+    },
+    {
+      "name": "NetworkState",
+      "discriminator": [
+        212,
+        237,
+        148,
+        56,
+        97,
+        245,
+        51,
+        169
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "DefendantJoined",
+      "discriminator": [
+        93,
+        236,
+        30,
+        54,
+        79,
+        126,
+        93,
+        80
+      ]
+    },
+    {
+      "name": "DisputeCreated",
+      "discriminator": [
+        254,
+        202,
+        51,
+        123,
+        100,
+        152,
+        137,
+        93
+      ]
+    },
+    {
+      "name": "JuryRequested",
+      "discriminator": [
+        159,
+        49,
+        192,
+        119,
+        57,
+        133,
+        110,
+        59
+      ]
+    },
+    {
+      "name": "JuryRevealed",
+      "discriminator": [
+        182,
+        93,
+        53,
+        126,
+        234,
+        220,
+        64,
+        236
+      ]
+    },
+    {
+      "name": "StakesClaimed",
+      "discriminator": [
+        31,
+        47,
+        230,
+        173,
+        87,
+        82,
+        182,
+        57
+      ]
+    },
+    {
+      "name": "VerdictReached",
+      "discriminator": [
+        10,
+        201,
+        171,
+        77,
+        103,
+        125,
+        37,
+        30
+      ]
+    },
+    {
+      "name": "VoteCast",
+      "discriminator": [
+        39,
+        53,
+        195,
+        104,
+        188,
+        17,
+        225,
+        213
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "DescriptionTooLong",
+      "msg": "Description must be 256 characters or less"
+    },
+    {
+      "code": 6001,
+      "name": "ZeroStake",
+      "msg": "Stake must be greater than zero"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidStatus",
+      "msg": "Invalid dispute status for this action"
+    },
+    {
+      "code": 6003,
+      "name": "DefendantAlreadyJoined",
+      "msg": "Defendant has already joined"
+    },
+    {
+      "code": 6004,
+      "name": "ZeroSeed",
+      "msg": "VRF seed must not be zero"
+    },
+    {
+      "code": 6005,
+      "name": "InsufficientRandomness",
+      "msg": "Not enough randomness to select jury"
+    },
+    {
+      "code": 6006,
+      "name": "NotAJuror",
+      "msg": "Signer is not a selected juror"
+    },
+    {
+      "code": 6007,
+      "name": "AlreadyVoted",
+      "msg": "Juror has already voted"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidVote",
+      "msg": "Invalid vote value"
+    },
+    {
+      "code": 6009,
+      "name": "NotTheWinner",
+      "msg": "Signer is not the dispute winner"
+    },
+    {
+      "code": 6010,
+      "name": "RandomnessNotFulfilled",
+      "msg": "VRF randomness not yet fulfilled"
+    }
+  ],
+  "types": [
+    {
+      "name": "DefendantJoined",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "defendant",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Dispute",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "plaintiff",
+            "type": "pubkey"
+          },
+          {
+            "name": "defendant",
+            "type": "pubkey"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "stake_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "DisputeStatus"
+              }
+            }
+          },
+          {
+            "name": "jury",
+            "type": {
+              "array": [
+                "pubkey",
+                3
+              ]
+            }
+          },
+          {
+            "name": "votes",
+            "type": {
+              "array": [
+                "u8",
+                3
+              ]
+            }
+          },
+          {
+            "name": "vrf_seed",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "winner",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisputeCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "plaintiff",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_lamports",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DisputeStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "AwaitingJury"
+          },
+          {
+            "name": "JuryRequested"
+          },
+          {
+            "name": "Deliberating"
+          },
+          {
+            "name": "Decided"
+          },
+          {
+            "name": "Claimed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JuryRequested",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "vrf_seed",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "JuryRevealed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "jury",
+            "type": {
+              "array": [
+                "pubkey",
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NetworkConfiguration",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "request_fee",
+            "type": "u64"
+          },
+          {
+            "name": "fulfillment_authorities",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "token_fee_config",
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "OraoTokenFeeConfig"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NetworkState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "config",
+            "type": {
+              "defined": {
+                "name": "NetworkConfiguration"
+              }
+            }
+          },
+          {
+            "name": "num_received",
+            "docs": [
+              "Total number of received requests."
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OraoTokenFeeConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "docs": [
+              "ORAO token mint address."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "docs": [
+              "ORAO token treasury account."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "fee",
+            "docs": [
+              "Fee in ORAO SPL token smallest units."
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakesClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerdictReached",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "winner",
+            "type": "u8"
+          },
+          {
+            "name": "plaintiff_votes",
+            "type": "u8"
+          },
+          {
+            "name": "defendant_votes",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VoteCast",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "juror",
+            "type": "pubkey"
+          },
+          {
+            "name": "vote",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}
