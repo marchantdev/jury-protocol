@@ -66,26 +66,45 @@ State machine: `Open → AwaitingJury → JuryRequested → Deliberating → Dec
 
 ---
 
-## 3. The Innovation: Micro-Disputes as a New Market
+## 3. Two Innovations — Not a Port
 
-This is NOT "Kleros ported to Solana." The cost structure difference creates a fundamentally new market category.
+This is NOT "Kleros ported to Solana." JURY introduces two structural innovations that create a new category:
 
-| Feature | Kleros (ETH) | JURY (Solana) | Why It Matters |
-|---------|-------------|---------------|----------------|
-| Randomness | Block hash (validator-predictable) | Orao VRF (4-auth BFT quorum) | Cryptographically verifiable, not gameable |
-| Cost/dispute | $50-200 gas | ~$0.01 | Enables micro-disputes ($5-50) |
-| Jury speed | Minutes to hours | ~2.5 seconds | Instant jury assignment |
-| Staking | PNK token (~5K holders) | SOL (native, millions of holders) | No proprietary token purchase |
-| Integration | Standalone platform | CPI-embeddable | Any Anchor program can add disputes |
-| Minimum viable dispute | ~$200 (below this, gas > stake) | ~$1 | 200x lower dispute floor |
+### Innovation 1: CPI-Composable Justice (Architectural)
 
-**Why this is a new market, not a port:**
+Kleros and Aragon are **standalone platforms** — users leave their dApp, navigate to Kleros, file a dispute there, then return. This is a UX dead end.
 
-Kleros cannot economically resolve a $20 dispute because gas alone costs $50+. Their data confirms: the median Kleros dispute involves $200+ in value. Everything below that threshold — freelancer micro-gigs, NFT chargebacks under $100, DAO grant disagreements under $500 — is an unserved market.
+JURY is **CPI-embeddable**: any Anchor program can invoke `jury_program::cpi::create_dispute()` directly. Dispute resolution becomes invisible infrastructure, not a destination:
 
-JURY at $0.01/tx makes these viable. This is not cheaper Kleros. This is a market that literally cannot exist on Ethereum. The analogy: Stripe did not port PayPal to mobile. Stripe made programmatic payments possible — which created an entirely new market of SaaS billing, marketplace payments, and API-first commerce that PayPal could not serve. JURY does the same for disputes: it makes programmatic, embeddable dispute resolution possible at a price point that unlocks micro-commerce trust.
+```rust
+// Any marketplace can add this in 3 lines:
+jury_program::cpi::create_dispute(ctx, dispute_id, description, stake)?;
+```
 
-**The structural innovation is CPI-embeddability.** Kleros is a standalone platform users visit. JURY is infrastructure any Anchor program can call. When Tensor embeds JURY, every NFT trade gets a "Dispute" button — dispute volume scales with Tensor's transaction volume, not with JURY's user acquisition. This is invisible infrastructure that earns on usage.
+**What this enables (impossible with Kleros):**
+- **Tensor** adds "Dispute this trade" as a one-click button — no external navigation
+- **Superteam Earn** auto-triggers disputes when bounty deliverables are contested
+- **Any escrow program** adds JURY as a fallback when parties disagree
+- Dispute volume scales with **partner transaction volume**, not JURY's user acquisition
+
+This is the Stripe model: Stripe didn't make PayPal cheaper. Stripe made programmatic payments possible — invisible to the end user, embedded in the application. JURY does the same for disputes.
+
+**No other blockchain dispute system is CPI-composable.** Kleros requires off-chain interaction. Aragon Court requires governance token staking outside the application. JURY lives inside the transaction graph.
+
+### Innovation 2: Micro-Dispute Economics (Market-Creating)
+
+| Feature | Kleros (ETH) | JURY (Solana) | Delta |
+|---------|-------------|---------------|-------|
+| Randomness | Block hash (validator-manipulable) | Orao VRF (4-auth BFT quorum) | Cryptographically verifiable |
+| Cost/dispute | $50-200 gas | ~$0.01 | 5,000-20,000x cheaper |
+| Jury speed | Minutes to hours | ~2.5 seconds | Instant |
+| Staking | PNK token (~5K holders) | SOL (native, millions) | Zero friction |
+| Integration | Standalone platform | CPI-embeddable | Composable primitive |
+| Min viable dispute | ~$200 | ~$1 | 200x lower floor |
+
+Kleros cannot economically resolve a $20 dispute because gas alone costs $50+. Their data confirms: the median Kleros dispute involves $200+ in value. Everything below — freelancer micro-gigs, NFT chargebacks under $100, DAO grant disagreements under $500 — is an entirely unserved market.
+
+JURY at $0.01/tx makes $5-$50 disputes viable. This market literally cannot exist on Ethereum. It's not "cheaper Kleros" — it's a category that is structurally impossible on any chain with >$1 transaction costs.
 
 ---
 

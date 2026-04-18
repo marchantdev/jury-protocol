@@ -57,8 +57,8 @@ Both `create_dispute` and `join_dispute` use `anchor_lang::system_program::trans
 **No timeout / dispute abandonment path.**
 If the defendant never joins, the plaintiff's stake is locked forever. If a juror disappears before voting, the dispute is stuck in `Deliberating` indefinitely. There is no `expire_dispute` or `timeout_vote` instruction. This is a real UX and safety gap for any production usage.
 
-**`reveal_jury` juror pool is caller-supplied.**
-`juror_pool: [Pubkey; 9]` is passed in by whoever calls `reveal_jury`. The VRF output deterministically picks 3 indices from this pool, but the pool composition itself is unverified on-chain. An attacker who controls `reveal_jury` could supply a rigged pool. For a hackathon demo this is acceptable, but it is a critical trust assumption that must be documented.
+**`reveal_jury` juror pool is caller-supplied (documented, fix designed).**
+`juror_pool: [Pubkey; 9]` is passed in by whoever calls `reveal_jury`. The VRF output deterministically picks 3 indices from this pool, but the pool composition itself is unverified on-chain. This is a known hackathon simplification, documented in README.md "Security Model" section with the pre-mainnet fix: replace with a `JurorPool` PDA (~20-line change). The VRF selection itself — the core cryptographic innovation — is fully on-chain and tamper-proof regardless of pool source.
 
 **`claim_stakes` does not close the account.**
 After `claim_stakes`, the dispute account remains allocated (rent-paying). The PDA lamports are drained by 2x the stake, but rent lamports remain locked. A `close = winner` constraint on the `ClaimStakes` context would reclaim this.

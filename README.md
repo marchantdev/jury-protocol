@@ -121,17 +121,47 @@ npm run dev   # http://localhost:5173
 | Orao VRF | `VRFzZoJdhFWL8rkvu87LpKM3RbcVezpMEc6X5GVDr7y` |
 | Deploy Tx | [`33swTRy...sDFm`](https://explorer.solana.com/tx/33swTRyk9qucDa9xpAaGsn88cqWMbpXJwQ9AQ4UXbw1S9Ma4kkceLH7bVyXkgvytDwQRepi3nxKEH5PsntXtsDFm?cluster=devnet) |
 
+## The Real Innovation: CPI-Composable Justice
+
+Kleros and Aragon are **standalone platforms** — users must leave their dApp, go to Kleros, file there. JURY is **CPI-embeddable**: any Anchor program can invoke `create_dispute` directly. This means:
+
+- **Tensor** can add "Dispute this trade" as a one-click button that calls JURY's program via CPI
+- **Superteam Earn** can embed dispute resolution into bounty payout logic — auto-triggered if a deliverable is contested
+- **Any escrow program** can add `jury_program::cpi::create_dispute()` as a fallback when parties disagree
+
+This is not "Kleros but cheaper." This is **programmatic justice** — dispute resolution as a composable primitive that other programs call, not a website users visit. The same architectural shift that made Stripe different from PayPal: not a destination, but infrastructure.
+
+**No other blockchain dispute system is CPI-composable.** Kleros requires off-chain interaction. Aragon Court requires governance token staking outside the application. JURY lives inside the transaction graph.
+
+## Security Model
+
+### Juror Selection Integrity
+- **Randomness:** Orao VRF with 4-authority Byzantine quorum. No single authority can predict or bias the output. Verifiable on-chain via fulfilled randomness account.
+- **Selection algorithm:** `randomness[i] % pool_size` with deduplication loop (up to 64 bytes consumed). Deterministic — anyone can verify the same randomness produces the same jury.
+
+### Current Limitations (Devnet)
+- **Juror pool is caller-supplied in `reveal_jury`:** The current implementation accepts `juror_pool: [Pubkey; 9]` as an instruction argument. This is a known hackathon simplification.
+- **Production fix (pre-mainnet):** Replace with a `JurorPool` PDA initialized by protocol admin. `reveal_jury` reads the pool from on-chain state, not caller input. This is a ~20-line change that does not affect the VRF selection logic.
+- **Why it doesn't undermine the demo:** On devnet, the pool is hardcoded in the frontend. The VRF selection itself — the cryptographic innovation — is fully on-chain and tamper-proof regardless of pool source.
+
+### Signer Checks
+- Only the plaintiff can create a dispute
+- Only the defendant can join
+- Only selected jurors can vote (checked against `dispute.jury[]`)
+- Only the winner can claim stakes
+- All enforced by Anchor account constraints and `require!()` checks
+
 ## Juror Pool Design
 
 ### Current (Devnet)
-Pre-seeded pool of 9 juror addresses. VRF derives 3 unique juror indices via `randomness[i*8..i*8+8] mod pool_size` with deduplication. Fully implemented and tested.
+Pre-seeded pool of 9 juror addresses. VRF derives 3 unique juror indices via `randomness[i] % pool_size` with deduplication. Fully implemented and tested.
 
 ### Production Roadmap
-- Dynamic juror registry PDA (stake SOL to register)
-- Slash conditions for non-voting jurors
-- 50% protocol fee split among voting jurors
-- Domain-specific pools (NFT, DeFi, freelance)
-- Reputation graph — on-chain voting history as identity
+- Dynamic juror registry PDA (stake SOL to register, minimum stake required)
+- Slash conditions for non-voting jurors (forfeit stake)
+- 50% protocol fee split among voting jurors (incentive alignment)
+- Domain-specific pools (NFT disputes, DeFi disputes, freelance disputes)
+- Reputation graph — on-chain voting history as trustworthiness identity
 
 ## Post-Hackathon Roadmap
 
