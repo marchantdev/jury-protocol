@@ -32,7 +32,7 @@ JURY is a Solana program that lets any two parties open a dispute, stake SOL, an
 | 2 | `NT2F1br99zq46YiYidRabJFyT2h4V3Dit4NoQ3jXZLPXDpq4BEK194BQpn7TKVGka32ZwwGMkxzWbgKkmt8eDMv` | 4 | 2293ms | [8,3,5] |
 | 3 | `4e3Zy9PvxuzwVCfBEovEptnmvhXrELH2MSfh6BMTnSKDxHbTRqjTMn2wKDNsBWoCn7wwvemyW1JHh3mE8H4Lr5wA` | 5 | 2515ms | [7,5,1] |
 
-**Mean fulfillment: 4.5 slots (~2.5 seconds).** Fast enough for a live demo.
+**Mean fulfillment: 4.5 slots (~2.5 seconds).** This speed matters because it enables **embedded dispute resolution** — jury selection can happen as a synchronous step in a marketplace checkout or escrow release flow, rather than being a separate multi-minute process that users navigate to. The speed transforms dispute resolution from "formal arbitration system" into "inline UX feature."
 
 ### Anchor Program — Compiled (294KB BPF binary)
 
@@ -56,6 +56,20 @@ Each transition is gated by status checks and signer verification.
 - Dispute list with status badges and jury composition
 - Wallet connection via Phantom adapter
 - On-chain proof section with program ID and VRF details
+
+---
+
+## Juror Pool Design
+
+The "pool of nine" is not a set of random wallets. Jurors are **staked participants** with skin in the game:
+
+- **Juror registration:** Wallets stake SOL to join the juror pool. Minimum stake ensures economic commitment.
+- **Per-dispute pools:** Disputes can use the global pool (open disputes) or curated lists (e.g., wallets holding a specific DAO's governance token — enabling community-specific arbitration).
+- **Selection mechanism:** `reveal_jury` takes Orao VRF's 64-byte random output and derives 3 unique indices via `randomness[i*8..i*8+8] mod pool_size`. Deterministic given the VRF output — anyone can verify.
+- **Incentives:** Jurors earn 50% of the protocol fee on resolved disputes. Jurors who fail to vote within the deliberation window lose their stake (Schelling-point incentive).
+- **Why SOL, not a governance token:** Kleros requires purchasing PNK ($3M+ market cap, concentrated ownership) to participate. JURY uses SOL — every Solana user already holds it. This expands the juror pool from ~5K PNK holders to millions of SOL wallets.
+
+The devnet implementation uses 9 pre-seeded addresses for demo purposes. Production deployment would use a dynamic juror registry PDA with registration and staking instructions.
 
 ---
 
