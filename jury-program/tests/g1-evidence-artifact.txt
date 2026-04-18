@@ -1,0 +1,182 @@
+   Compiling jury-program v0.1.0 (/opt/autonomous-ai/hackathons/frontier/jury-program/programs/jury-program)
+    Finished `release` profile [optimized] target(s) in 4.73s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.23s
+     Running unittests src/lib.rs (/opt/autonomous-ai/hackathons/frontier/jury-program/target/debug/deps/jury_program-2441623c2a08323a)
+   Compiling jury-program v0.1.0 (/opt/autonomous-ai/hackathons/frontier/jury-program/programs/jury-program)
+   Compiling example-escrow v0.1.0 (/opt/autonomous-ai/hackathons/frontier/jury-program/programs/example-escrow)
+warning: unexpected `cfg` condition value: `cpi`
+  --> programs/example-escrow/src/lib.rs:14:1
+   |
+14 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `program` crate for guidance on how handle this unexpected cfg
+   = help: the attribute macro `program` may come from an old version of the `anchor_attribute_program` crate, try updating your dependency with `cargo update -p anchor_attribute_program`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: requested on the command line with `-W unexpected-cfgs`
+   = note: this warning originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `custom-heap`
+  --> programs/example-escrow/src/lib.rs:14:1
+   |
+14 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::custom_heap_default` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::custom_heap_default` may come from an old version of the `solana_program_entrypoint` crate, try updating your dependency with `cargo update -p solana_program_entrypoint`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the macro `$crate::custom_heap_default` which comes from the expansion of the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `custom-panic`
+  --> programs/example-escrow/src/lib.rs:14:1
+   |
+14 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::custom_panic_default` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::custom_panic_default` may come from an old version of the `solana_program_entrypoint` crate, try updating your dependency with `cargo update -p solana_program_entrypoint`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the macro `$crate::custom_panic_default` which comes from the expansion of the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+  --> programs/example-escrow/src/lib.rs:14:1
+   |
+14 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `program` crate for guidance on how handle this unexpected cfg
+   = help: the attribute macro `program` may come from an old version of the `anchor_attribute_program` crate, try updating your dependency with `cargo update -p anchor_attribute_program`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+  --> programs/example-escrow/src/lib.rs:14:1
+   |
+14 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+   = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+  --> programs/example-escrow/src/lib.rs:45:10
+   |
+45 | #[derive(Accounts)]
+   |          ^^^^^^^^
+   |
+   = note: expected values for `feature` are: `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+   = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: `example-escrow` (lib) generated 11 warnings (5 duplicates)
+    Finished `release` profile [optimized] target(s) in 7.07s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.25s
+     Running unittests src/lib.rs (/opt/autonomous-ai/hackathons/frontier/jury-program/target/debug/deps/example_escrow-791956191a9f34e3)
+
+Found a 'test' script in the Anchor.toml. Running it as a test suite!
+
+Running test suite: "/opt/autonomous-ai/hackathons/frontier/jury-program/Anchor.toml"
+
+yarn run v1.22.22
+$ /opt/autonomous-ai/hackathons/frontier/jury-program/node_modules/.bin/ts-mocha -p ./tsconfig.json -t 1000000 tests/evidence-run.ts
+
+
+  G1 evidence: 3 throwaway-wallet lifecycle runs
+  TX initialize_juror_pool: 2p6yFmaHQtHDaDgAXvWSrh7Wir37GsC3kPD1ZEMXWvVzL4hATisxBZoTZxNBL1RnqjTLNMPVG64Ea5raquCCFSfZ
+  Admin wallet: GpXHXs5KfzfXbNKcMLNbAMsJsgPsBE7y5GtwVoiuxYvH
+  Program ID: AyLgnN3s5QdhVEQ6qzSXGarUW786tnrmgdsHS19oABxT
+    Run 1
+  TX register_juror: 2eYjuZQXYb2Ag3gusPLxWvtHBz2pFCeLuwfpqoTRdKzQmRoKPuFixbDp7xmCujvgt4htRSZ431YNUAcLQqHN66ff (JCXovjbi8RxXPsutrbrbukLePim9vCSQgc6WX7E918RR)
+  TX register_juror: 4scdQaqhX82UGk4wrv2sh9sWYe8EhpaSgiunKX8CUdPzbAeo1nv8B7JXEbDm7fxj7vST2ieZhMjHFmjc281LkMA1 (HYf2gW2JR93TZckkpeL5JLcvTfoHnrfECgCJ4YH8hQQx)
+  TX register_juror: 5FTGXGRM8uTQPfxQd9H3jz2sdxEMXc3kLe52fX8UptiUc55ubsiAQhn44TzbpcsVmrdurB54dqFPkuj8cMMitf62 (8DzierqzTSjq13uSViGmvL2ACPvj6bCWWfquLAv4uzqS)
+  TX register_juror: 4Z167RXkQiNqCnsTAthYarYAZfpuoZfsHsVerQAYB96D8NxLhTdKQChpfnxvHhoGrp7tEbe3nD1o5DA1oidhv1Lt (6R1YbsvQBFMkU8RRPNczsBzJ8RRMQDrmUrQyAkPWSHyp)
+  TX register_juror: G6ctT76SyTBufSgZXpFTPSjpxmVFH1anX3kresuNtC6K7Vuy5mHQGX5QLY3eFVJfqVzAY78MR81JXAF3VvsNzVW (Dh8kADwCPZP1b5tTwLF2gmV7RMSU2qV5ykg8omoXkC2R)
+      ✔ register_juror (5 throwaway wallets) (2124ms)
+  TX create_dispute: wcXsLWxHfxgL9mD61HexCzrG73rqpMDmJ74Tv3Nrhc5iiHKfMtqrW7NjHPTLH5VQJnzbVifaJngSep5WXfRvFVx
+  Plaintiff: Dnzv9WrLmSTycPbTrY83oHaNGmFWpJ2zFp5p7fMQqT9i
+  Dispute PDA: HYcCR36mmT651i962QyZ3s9Cg8Bi7vkVFFPAe9D5ciny
+      ✔ create_dispute (throwaway plaintiff) (422ms)
+  TX join_dispute: 4HaywFKCQY77dzms7r89CYsdBkng9BBwSkQTa6vhEsF791LDVRott7wxqhvgYXKnNDXeJXFbDeTsBySwWs1LdSfQ
+  Defendant: Apkx6MS6Srgd44ZTZesuEx4feWqKwRSWBzDoGBqqPWb2
+      ✔ join_dispute (throwaway defendant) (421ms)
+  TX submit_evidence: 5nh4qqe61HsyYonLLEGbpNSSq9VKgkqfsE5HjCYY5dE9aG48dBQtXgNVoDTwE52KYs9PywuiUPBNuWQi4on4BzEw
+      ✔ submit_evidence (plaintiff) (430ms)
+  TX debug_set_jury: 45H5YKzxVbcbvDFtos4UYVv2yVJuqosC4a8awVR3TTaNTkUuKfNFu6fbhK81wDHxNZ7VkRx7q65v5AsJtQCbNBqy
+  TX cast_vote (juror 0, vote=plaintiff): 5TmLxUdohSGmMi6zmtMqEJj9s3CyLj5TuzG15MJDUHgFVFJiUhZRqudThwYPVBck6kG8BAP7yzdBw5xYsJVZyayw
+  TX cast_vote (juror 1, vote=plaintiff): 5c7ScrxRq25s8Wiiufa4jE5SwUJ5kLdRk5B4CLcvSHayvnjjvKMrtQR6UashxJccwiGkAeSc7QpBPufjp6FgK1nL
+  TX cast_vote (juror 2, vote=defendant): 2fCDGuVBBfS2XMJAhTrpHarcBMebVwb4QxeCa5MgDCDRxkVR7aFzKCpmCjRwFrEAwdX3FNVu4oAbCZU63qmxLeuh
+      ✔ debug_set_jury + cast_vote (3 jurors vote) (1706ms)
+  TX claim_stakes: 3GqUqM2K4btzJ9Ydj9384Cfatxww5MMwqWa4n7Knft6yhE9JG473fgvdUTutrN5HxucdbUsCmVZGkSWaADdHVP7w
+  Winner: Dnzv9WrLmSTycPbTrY83oHaNGmFWpJ2zFp5p7fMQqT9i
+  --- Run 1 complete: full lifecycle with throwaway wallets ---
+      ✔ claim_stakes (winner claims) (428ms)
+    Run 2
+  TX register_juror: 4SQwjEMTbroSpVeSDFWPjFjZvbRGDRFUAdxdjNsYp1LUJoAVG53xFPmKcP1PMVWa6km1PvcSye98fbJ5KfGMzXHp (Ha56UcLWEzJ3hiUhwEHEgFe2ToZftbXgts9KvvYDRpBk)
+  TX register_juror: 275LHH4MsVBXSWym1vH8kmmcTMNGbqwULSZ62aCzAbG5uGVMTFFiZVvkxw8EvVCSoqScy5SEuNztxxTQk6U58MKn (6vF3DjJb5SNzQPr2pfpsQ8m9HyVJxx5gVnUBfxDV7DM6)
+  TX register_juror: 2nThXCL4uQVnxQoBfb2nhUXD8dkvYh4tGQYT5YTfarMd5Wfv7bdFK7aWwdujrp4gUx2zuGJLS1HGtm4V7hdMv2uM (554AeTm3G3XVNZdGiyWjaY5z6JkiKGPjQPaedcTUA27X)
+  TX register_juror: 5MwrGHAeWH4TzZUEaV9DTMU4A1K8oh9vADE3kmX4XzYtu1qHEQDVDPaZRfsTjHEscV9zr8gmyTZJyKfSRRo8SNNy (AUMss6KKZnAUVvSHMnNKJCzEU25wBzTSYLKJAPfvvnA3)
+  TX register_juror: 24rnC1tydaZ7MTqyWaWJEa4cdUDK2AkgxWa28L2xtbgUbNDiJtCArg7eWee35Ago5hMWRBYw8zUj1UUiPJaqhgVG (DFBtr7QV7XunGUfzTogZrLDbhM4cVku4viLbjweAsSw9)
+      ✔ register_juror (5 throwaway wallets) (2162ms)
+  TX create_dispute: 2uvWhMcbZ8pZprE5YjVFVqxBnXZBSXGESuBGdVioiYbHFo6zNqf2gZESkcWkXyA3cnFaoB753F25gJ9k68wqLJWM
+  Plaintiff: 2WHuhJiTugJmqSCeWuKJWo7o4HLuf6dsM3U6zo2F7wBP
+  Dispute PDA: BnbyYgno8LTcjkGW549KUJgGFKKK5jjRB3sgMNES3WNY
+      ✔ create_dispute (throwaway plaintiff) (431ms)
+  TX join_dispute: 23hBS9QYMjFLAv93TTPno9PZN2nWoaJe2XD7Rp5ZYHEfCmGahRUn5jTzCNQyeEB2HJgFu63RoZX6vGPDrYQbv1Tc
+  Defendant: 5xsexQPzKHiJzshve1G7ybGucpyaGUMj9CasAy9rLhQz
+      ✔ join_dispute (throwaway defendant) (433ms)
+  TX submit_evidence: Go2aGC4JqhSnJuDB3VgZ7LucYSeyCdCHiauSA8L2dB4LhEVgmC5S26mMkJ6x8ioGYYEkYvYGVTHjUjdaeHw8hrT
+      ✔ submit_evidence (plaintiff) (434ms)
+  TX debug_set_jury: 2jZUEKMDYDPZwq5UmzvpnjfoPaPsbGYe5nhzd4VFthRP4S8NbbDq9KgUkofyryjMPwhqPVcKzCpncKJsohwsJXwC
+  TX cast_vote (juror 0, vote=plaintiff): 3nv3YGgsW7njyYXQnkFhY9eoVX3zVm9q5GgH5AY7U7vcrJnoTDq5DxVrJ4bfHbgRAbNimr26uTU5xekpzyZQbrkn
+  TX cast_vote (juror 1, vote=plaintiff): 3ZXENBK2M9qGDfFyidQ7knfUqUtNcD51PJdLsnyys3WHuuxMK9TWtuaKTGXiPA35c5wC8WDB2AiRrg1xfNXQwDBs
+  TX cast_vote (juror 2, vote=defendant): 4EjzrtqVSnGe44c4sht2KKDebWVvqE8We99LJxGLiKaxBrA9VbjG2CeyzC2h7D23f8B85RP7Ve4XfKfBLiKA3wRZ
+      ✔ debug_set_jury + cast_vote (3 jurors vote) (1725ms)
+  TX claim_stakes: 2dZ3L3y5jawy38sdnda3dxpQFLFZZEJvkfzxABQtdiRMytYDdBbqMuGW5ggaDotLti2sFaRrzqdPm51nswXBUihW
+  Winner: 2WHuhJiTugJmqSCeWuKJWo7o4HLuf6dsM3U6zo2F7wBP
+  --- Run 2 complete: full lifecycle with throwaway wallets ---
+      ✔ claim_stakes (winner claims) (432ms)
+    Run 3
+  TX register_juror: 44J1LkPXJxnyJHiCt2z4vuvS3XhCtAXgpUzSZMHSMuf3fW3LbRijTRMsSA9BUWc9f7oigRirQRLQqMYqD7rhZSq8 (DkJwHpYW8MKqAvBjUFyFRTP4tf4gisgwYqF3npDp2KCz)
+  TX register_juror: wKMRUVsjYgfQZ11S7DPRnSUJKT4owAiNsWAAozPDm2jbzChUZHqV6RKya2aDBzW7a7eWEwTC2HnGqXmK2NWaiJJ (BtgFxNCp5DuBipYTkK2WK5sHd3aGpSg7HjwrB4oEvNNL)
+  TX register_juror: 46V5e5phDWwFo3mXWVc7PsWdC5oAnoTKhMVbfxuggqJnVVLa99quw4gdXdFe3RerM2Qn5Hq4tG7fKwjAJDk5vtm2 (75LcfJ9PW2ve3NKjeuUj84PTnr8tSh8DRheocCY9EmEs)
+  TX register_juror: 3RSXdYwm4sEG4ukmnHHHcLKXArbw7i3XcRDA2vN1ArHBjtjzq5L9fzfdMsPGMZLySea9Vrg73zxyByYog8Wk7sr (H8nJjShMgRDBPnmJmAk5CeWB2yGVBCZVsmErtgfTJEoS)
+  TX register_juror: 5qHkYaHNK5vGRMabhyx4dkV4Yha8u4NF2LTGq45rnanvK9eg5BkaYQWK1vfWvC8BkSQ6WBG4Jj68PR2B2HihD1RR (4rpUvesnpXScdYj1aWJNmZEJk61Sror7jhzTTZj823rS)
+      ✔ register_juror (5 throwaway wallets) (2128ms)
+  TX create_dispute: 3at4B377bhNSsE8VJv8zXNQznTBEt1ubc8Nf6Cwi1TSTCfD4DtUbgDRk6YPJAFqBA4qYzQ3hgLA6aGyrJj8NgA5T
+  Plaintiff: 3ZKf1LrLKXgrGQmiNiD3jMcDb4ocgV7WdBzbAfyjTRFL
+  Dispute PDA: 992enxgHdcgPWHBwbi8XkgJ57hbPkQSVTkfTgXSmWnNR
+      ✔ create_dispute (throwaway plaintiff) (427ms)
+  TX join_dispute: 3RMHTdFb7Taamna5NetMno5ypMTYyCV9CcjSYerXJFKpJZvpB1rckLoEnifr8d2qzkUzE76LMHmiryaHkiDkgyKD
+  Defendant: G1q3ZX46o5KsGUm9t17s6EH4Ai6A5KH1hZkstu9u4Np
+      ✔ join_dispute (throwaway defendant) (425ms)
+  TX submit_evidence: 7FsihDhTEWqoG9xru826wSkVTm3zgH3i1yBj67ppDKhQuzKXGj4dQruhcEnbu1th4QVVfFpyiBeMK3UoHJEqaLi
+      ✔ submit_evidence (plaintiff) (417ms)
+  TX debug_set_jury: 2nyVZmwtQhbPSqMS6NthLx8NXTKSf7hbvAvNfsA1GDTbyDPAQRdwTM7xv9SaQmP2bZ8GY8jcJymwamRdVWrT8MfC
+  TX cast_vote (juror 0, vote=plaintiff): 8BHhaM2U6YnQThkgWPrFARkrByPTc4gZPhvW6iRHfK62XTrbSWH5XKtm67nsdn7roUY1issZ5zoC8YoXxhnD8jS
+  TX cast_vote (juror 1, vote=plaintiff): 3WxmExe31qyjMFn3gDup1NoeSmS1hpGVpG9njfdCuYiy4Gabd92qCTPmVaTYngDcUasB1bRwsafCuRvmx6J1WX4u
+  TX cast_vote (juror 2, vote=defendant): YDjrfx9FEQpmmsQ1y6gngWFxpTRJhLCEQSGKWeGLGHjaBWpcsKcZrxUeUZ9xv22Gnxbw7JqVQ7ookNkAxN7971q
+      ✔ debug_set_jury + cast_vote (3 jurors vote) (1718ms)
+  TX claim_stakes: 3ReoutqZSKfiMDgfx45rWNxSaUuNyyctWrnYavoQW8rHkpa3zDwrmmxJ6vAzHFD2As6ZKLpzEaGTPM7ciQ44NQF6
+  Winner: 3ZKf1LrLKXgrGQmiNiD3jMcDb4ocgV7WdBzbAfyjTRFL
+  --- Run 3 complete: full lifecycle with throwaway wallets ---
+      ✔ claim_stakes (winner claims) (432ms)
+
+
+  18 passing (18s)
+
+Done in 20.42s.
