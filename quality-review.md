@@ -278,8 +278,8 @@ Previously `reveal_jury` accepted `juror_pool: [Pubkey; 9]` from the caller. Fix
 **M4 — `claim_stakes` does not close the account.**
 Rent (~0.003 SOL) remains locked in the dispute PDA after the dispute resolves. Minor but a production quality issue.
 
-**M5 — No real-time updates in DisputeView.**
-State displayed is a snapshot at page load. If VRF fulfillment happens while a user is on the dispute page, they will not see it without a manual refresh.
+**M5 — Polling in DisputeView (RESOLVED).**
+DisputeView.tsx polls dispute state via `setInterval` — auto-refreshes until dispute reaches `Claimed` status. VRF fulfillment and vote changes are visible without manual refresh.
 
 ### Minor (low impact)
 
@@ -292,8 +292,8 @@ Should use `#[derive(InitSpace)]` to keep it in sync with struct changes automat
 **N3 — Only PhantomWalletAdapter is listed.**
 Backpack, Solflare, and other Solana wallets will not appear in the wallet modal. Minor, but Phantom is the expected hackathon wallet.
 
-**N4 — Space Grotesk and JetBrains Mono are loaded via system fallback, not via a web font import.**
-If the judge's machine does not have these fonts installed, the UI falls back to `system-ui`/`Consolas`. A Google Fonts or CDN import in `index.html` would guarantee the intended typography.
+**N4 — Fonts loaded correctly (NOT AN ISSUE).**
+Space Grotesk and JetBrains Mono are loaded via Google Fonts CDN in `index.html` (with preconnect). Font rendering is consistent across machines.
 
 ---
 
@@ -320,7 +320,7 @@ If the judge's machine does not have these fonts installed, the UI falls back to
 - [x] Status rendering correct for all 6 states
 - [x] Full dispute lifecycle accessible from browser (join, requestJury, revealJury, castVote, claimStakes)
 - [ ] TypeScript types used (not `any`)
-- [ ] Real-time polling or subscription
+- [x] Real-time polling (setInterval in DisputeView)
 - [x] "View Source" link points to actual repo
 
 ### Documentation
