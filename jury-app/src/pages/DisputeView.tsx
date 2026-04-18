@@ -1,19 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { Scale, ArrowLeft, RefreshCw, ExternalLink } from "lucide-react";
+import { Scale, ArrowLeft, RefreshCw, ExternalLink, UserPlus, Shuffle, CheckCircle, Trophy } from "lucide-react";
 import { STATUS_LABELS, STATUS_COLORS, statusToIndex } from "../lib/program";
-import { useProgram, fetchDispute, DisputeAccount } from "../lib/useProgram";
+import {
+  useProgram, fetchDispute, DisputeAccount,
+  joinDisputeTx, requestJuryTx, revealJuryTx, castVoteTx, claimStakesTx,
+} from "../lib/useProgram";
 
 export default function DisputeView() {
   const { id } = useParams<{ id: string }>();
-  const { connected } = useWallet();
+  const { connected, publicKey } = useWallet();
   const { program } = useProgram();
   const [dispute, setDispute] = useState<DisputeAccount | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionMsg, setActionMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!program || !id) return;
@@ -38,7 +43,40 @@ export default function DisputeView() {
       .finally(() => setLoading(false));
   }, [program, id]);
 
+  const reload = useCallback(() => {
+    if (!program || !id) return;
+    setLoading(true);
+    fetchDispute(program, new PublicKey(id))
+      .then((d) => { if (d) setDispute(d); })
+      .finally(() => setLoading(false));
+  }, [program, id]);
+
+  const runAction = useCallback(async (label: string, fn: () => Promise<string>) => {
+    setActionLoading(true);
+    setActionMsg(null);
+    try {
+      const sig = await fn();
+      setActionMsg(`${label} confirmed: ${sig.slice(0, 12)}...`);
+      setTimeout(reload, 1500);
+    } catch (e: any) {
+      setActionMsg(`${label} failed: ${e?.message?.slice(0, 80) || "Unknown error"}`);
+    } finally {
+      setActionLoading(false);
+    }
+  }, [reload]);
+
   const zeroPk = "11111111111111111111111111111111";
+
+  // Determine which actions are available
+  const si = dispute ? statusToIndex(dispute.status) : -1;
+  const myKey = publicKey?.toBase58() ?? "";
+  const isPlaintiff = dispute?.plaintiff.toBase58() === myKey;
+  const isDefendant = dispute?.defendant.toBase58() === myKey;
+  const isJuror = dispute?.jury.some((j) => j.toBase58() === myKey) ?? false;
+  const myJurorIdx = dispute?.jury.findIndex((j) => j.toBase58() === myKey) ?? -1;
+  const hasVoted = myJurorIdx >= 0 && (dispute?.votes[myJurorIdx] ?? 0) > 0;
+  const isWinner = dispute && dispute.winner > 0 &&
+    ((dispute.winner === 1 && isPlaintiff) || (dispute.winner === 2 && isDefendant));
 
   return (
     <div className="min-h-screen bg-jury-bg">
@@ -75,21 +113,16 @@ export default function DisputeView() {
             <div className="card">
               <div className="flex items-start justify-between mb-4">
                 <h2 className="text-lg font-bold text-jury-text flex-1 mr-4">{dispute.description}</h2>
-                {(() => {
-                  const si = statusToIndex(dispute.status);
-                  return (
-                    <span
-                      className="px-3 py-1 rounded text-sm font-mono whitespace-nowrap"
-                      style={{
-                        color: STATUS_COLORS[si],
-                        backgroundColor: STATUS_COLORS[si] + "15",
-                        border: `1px solid ${STATUS_COLORS[si]}30`,
-                      }}
-                    >
-                      {STATUS_LABELS[si]}
-                    </span>
-                  );
-                })()}
+                <span
+                  className="px-3 py-1 rounded text-sm font-mono whitespace-nowrap"
+                  style={{
+                    color: STATUS_COLORS[si],
+                    backgroundColor: STATUS_COLORS[si] + "15",
+                    border: `1px solid ${STATUS_COLORS[si]}30`,
+                  }}
+                >
+                  {STATUS_LABELS[si]}
+                </span>
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -183,6 +216,119 @@ export default function DisputeView() {
                 <p className="text-jury-muted text-xs mt-1">
                   Combined stake: {((dispute.stakeLamports.toNumber() * 2) / LAMPORTS_PER_SOL).toFixed(4)} SOL
                 </p>
+              </div>
+            )}
+
+            {/* Actions */}
+            {connected && program && (
+              <div className="card border-jury-green/20">
+                <h3 className="text-sm font-semibold text-jury-muted mb-3">Actions</h3>
+
+                {actionMsg && (
+                  <p className={`text-xs mb-3 font-mono ${actionMsg.includes("failed") ? "text-red-400" : "text-jury-green"}`}>
+                    {actionMsg}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {/* Join — open dispute, not the plaintiff */}
+                  {si === 0 && !isPlaintiff && (
+                    <button
+                      disabled={actionLoading}
+                      onClick={() => runAction("Join Dispute", () =>
+                        joinDisputeTx(program, publicKey!, dispute!.publicKey)
+                      )}
+                      className="btn-action"
+                    >
+                      <UserPlus size={14} /> Join as Defendant
+                    </button>
+                  )}
+
+                  {/* Request jury — awaiting jury (si=1) */}
+                  {si === 1 && (
+                    <button
+                      disabled={actionLoading}
+                      onClick={() => runAction("Request Jury", () =>
+                        requestJuryTx(program, publicKey!, dispute!.publicKey)
+                      )}
+                      className="btn-action"
+                    >
+                      <Shuffle size={14} /> Request VRF Jury
+                    </button>
+                  )}
+
+                  {/* Reveal jury — jury requested (si=2) */}
+                  {si === 2 && (
+                    <button
+                      disabled={actionLoading}
+                      onClick={() => runAction("Reveal Jury", () =>
+                        revealJuryTx(program, dispute!)
+                      )}
+                      className="btn-action"
+                    >
+                      <Shuffle size={14} /> Reveal Jury
+                    </button>
+                  )}
+
+                  {/* Vote — deliberating (si=3), user is juror, hasn't voted */}
+                  {si === 3 && isJuror && !hasVoted && (
+                    <>
+                      <button
+                        disabled={actionLoading}
+                        onClick={() => runAction("Vote Plaintiff", () =>
+                          castVoteTx(program, publicKey!, dispute!.publicKey, 1)
+                        )}
+                        className="btn-action"
+                      >
+                        <CheckCircle size={14} /> Vote Plaintiff
+                      </button>
+                      <button
+                        disabled={actionLoading}
+                        onClick={() => runAction("Vote Defendant", () =>
+                          castVoteTx(program, publicKey!, dispute!.publicKey, 2)
+                        )}
+                        className="btn-action btn-action-alt"
+                      >
+                        <CheckCircle size={14} /> Vote Defendant
+                      </button>
+                    </>
+                  )}
+
+                  {/* Claim — decided (si=4), user is the winner */}
+                  {si === 4 && isWinner && (
+                    <button
+                      disabled={actionLoading}
+                      onClick={() => runAction("Claim Stakes", () =>
+                        claimStakesTx(program, publicKey!, dispute!.publicKey)
+                      )}
+                      className="btn-action"
+                    >
+                      <Trophy size={14} /> Claim Stakes
+                    </button>
+                  )}
+
+                  {/* Refresh */}
+                  <button
+                    disabled={actionLoading}
+                    onClick={reload}
+                    className="px-3 py-1.5 rounded text-xs text-jury-muted border border-jury-border hover:border-jury-green/40 transition-colors flex items-center gap-1"
+                  >
+                    <RefreshCw size={12} className={actionLoading ? "animate-spin" : ""} /> Refresh
+                  </button>
+                </div>
+
+                {actionLoading && (
+                  <p className="text-jury-muted text-xs mt-2 flex items-center gap-1">
+                    <RefreshCw size={12} className="animate-spin" /> Waiting for confirmation...
+                  </p>
+                )}
+              </div>
+            )}
+
+            {!connected && (
+              <div className="card text-center py-4">
+                <p className="text-jury-muted text-sm mb-2">Connect your wallet to interact with this dispute</p>
+                <WalletMultiButton />
               </div>
             )}
 
