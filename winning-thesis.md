@@ -2,15 +2,19 @@
 
 **Project:** JURY
 **Hackathon:** Colosseum Frontier (Solana, deadline 2026-05-11)
-**One-sentence pitch:** *JURY is the first on-chain dispute resolution company on Solana — enabling micro-disputes under $500 that are economically impossible on any other chain.*
+**One-sentence pitch:** *JURY is the first CPI-composable dispute resolution protocol on Solana — any Anchor program can embed verifiable jury selection with a single cross-program invocation, unlocking micro-disputes under $500 that are economically impossible on any other chain.*
 
 ---
 
 ## 0. Company & Founder Vision
 
-JURY is not a hackathon demo. It is a company building trust infrastructure for the Solana economy.
+JURY is a company building the trust infrastructure layer for the Solana economy — not a hackathon demo.
 
-**The company thesis:** Every marketplace, escrow, and P2P protocol eventually needs neutral dispute resolution. On Ethereum, Kleros proved this market exists ($50M+ in disputed value since 2019). On Solana, that infrastructure does not exist — and the cost structure ($0.01/tx vs $50-200/tx) unlocks an entirely new category: micro-disputes under $500 that Kleros structurally cannot serve.
+**The company thesis:** Every marketplace, escrow, and P2P protocol eventually needs neutral dispute resolution. On Ethereum, Kleros proved this market exists ($50M+ in disputed value since 2019). On Solana, that infrastructure does not exist — and two structural advantages create a new market:
+
+1. **CPI composability** — JURY is not a standalone platform. It is infrastructure that other programs call via cross-program invocation. Dispute volume scales with partner transaction volume (the Stripe model), not our own user acquisition. No blockchain dispute system has ever been CPI-embeddable.
+
+2. **Micro-dispute economics** — At $0.01/tx vs Kleros' $50-200/tx, JURY makes $5-$50 disputes rational for the first time. This is not "cheaper Kleros" — it is a new market category that structurally cannot exist on Ethereum.
 
 **What we are building (beyond the hackathon):**
 - A TypeScript SDK that lets any Solana dApp embed dispute resolution in 10 lines of code

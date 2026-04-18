@@ -1,29 +1,44 @@
-# JURY — On-Chain Dispute Resolution for Solana
+# JURY — Programmable Dispute Resolution Infrastructure for Solana
 
-**The first dispute resolution company on Solana.** Micro-disputes under $500 — economically impossible on any other chain — resolved in 30 seconds for $0.01.
+**JURY is a dispute resolution company building trust infrastructure for the Solana economy.** Any Solana program can embed neutral, verifiable dispute resolution via a single CPI call — the way programs call SPL Token today.
 
 **Live demo:** [jury-app-eight.vercel.app](https://jury-app-eight.vercel.app)
 **Program:** [`4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15`](https://explorer.solana.com/address/4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15?cluster=devnet) (Solana Devnet)
 
 ---
 
-## Why JURY Exists
+## Two Innovations — Not a Port
 
-Solana processes $8B+ in DeFi TVL and $200M+ monthly NFT volume, but has **zero native dispute resolution**. When trades go wrong, users eat the loss. Ethereum has Kleros ($50M+ in disputed value since 2019), but at $50-200/dispute in gas — making any dispute under $500 economically irrational.
+JURY is **not** Kleros on Solana. It introduces two structural innovations that create a new market:
 
-**JURY unlocks micro-disputes: $1-$500 disagreements that cannot exist on Ethereum.**
+### 1. CPI-Composable Justice (Architectural Innovation)
 
-This is not cheaper Kleros. This is a new market category — like Stripe didn't make PayPal cheaper, it made programmatic payments possible.
+Kleros and Aragon are **standalone platforms** — users leave their dApp, navigate to a separate site, file a dispute there. JURY is **CPI-embeddable**: any Anchor program can invoke dispute resolution directly within its own transaction flow.
 
-### Demand Evidence (Not Hypothetical)
+```rust
+// Tensor adds "Dispute this trade" in 3 lines:
+jury_program::cpi::create_dispute(ctx, dispute_id, description, stake)?;
+```
+
+This is the difference between PayPal (a destination) and Stripe (infrastructure). Dispute volume scales with **partner transaction volume**, not JURY's own user acquisition. No other blockchain dispute system is CPI-composable.
+
+### 2. Micro-Dispute Economics (Market-Creating Innovation)
+
+At $50-200 gas on Ethereum, Kleros cannot economically resolve disputes under ~$200. JURY at $0.01/tx unlocks a market that **literally cannot exist** on any other chain: $5 freelance disputes, $20 NFT chargebacks, $100 escrow disagreements. This is not "cheaper Kleros" — it's a new category of disputes that were previously unresolvable.
+
+---
+
+## The Problem — Validated by Real Data
+
+Solana processes $8B+ in DeFi TVL and $200M+ monthly NFT volume, but has **zero native dispute resolution**. Every marketplace, escrow, and P2P protocol handles disputes the same way: off-chain, centralized, opaque.
 
 | Source | Evidence |
 |--------|----------|
-| **Kleros** | $50M+ in disputed value on Ethereum since 2019, despite $50-200 gas. Proves demand at prohibitive prices. |
-| **Tensor/Magic Eden** | Discord #support channels show daily buyer disputes. Resolved by centralized teams — doesn't scale. |
-| **Superteam Earn** | $2M+ in bounties paid. "Did you deliver?" is the #1 dispute. Resolved by admin discretion. |
+| **Kleros** | $50M+ in disputed value on Ethereum since 2019, despite $50-200 gas. Proves demand exists at prohibitive prices. |
+| **Tensor/Magic Eden** | Discord #support channels show daily buyer disputes. Centralized support teams — doesn't scale and contradicts decentralization. |
+| **Superteam Earn** | $2M+ in bounties paid. "Did you deliver?" is the #1 dispute. Admin discretion, no neutral recourse. |
 | **DAO governance** | Mango, Drift, Bonk DAOs use informal multisig votes for grant disputes. Governance theater. |
-| **Mathematical proof** | At $50+ gas, disputes under $500 are irrational on Ethereum. JURY at $0.01 makes $5 disputes viable. |
+| **Mathematical proof** | At $50+ gas, disputes under $500 are irrational on Ethereum. JURY at $0.01 makes $5 disputes viable — a 200x lower floor. |
 
 ## How It Works
 
@@ -120,18 +135,6 @@ npm run dev   # http://localhost:5173
 | JURY Program | `4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15` |
 | Orao VRF | `VRFzZoJdhFWL8rkvu87LpKM3RbcVezpMEc6X5GVDr7y` |
 | Deploy Tx | [`33swTRy...sDFm`](https://explorer.solana.com/tx/33swTRyk9qucDa9xpAaGsn88cqWMbpXJwQ9AQ4UXbw1S9Ma4kkceLH7bVyXkgvytDwQRepi3nxKEH5PsntXtsDFm?cluster=devnet) |
-
-## The Real Innovation: CPI-Composable Justice
-
-Kleros and Aragon are **standalone platforms** — users must leave their dApp, go to Kleros, file there. JURY is **CPI-embeddable**: any Anchor program can invoke `create_dispute` directly. This means:
-
-- **Tensor** can add "Dispute this trade" as a one-click button that calls JURY's program via CPI
-- **Superteam Earn** can embed dispute resolution into bounty payout logic — auto-triggered if a deliverable is contested
-- **Any escrow program** can add `jury_program::cpi::create_dispute()` as a fallback when parties disagree
-
-This is not "Kleros but cheaper." This is **programmatic justice** — dispute resolution as a composable primitive that other programs call, not a website users visit. The same architectural shift that made Stripe different from PayPal: not a destination, but infrastructure.
-
-**No other blockchain dispute system is CPI-composable.** Kleros requires off-chain interaction. Aragon Court requires governance token staking outside the application. JURY lives inside the transaction graph.
 
 ## Security Model
 
