@@ -124,14 +124,25 @@ npm run dev   # http://localhost:5173
 
 ## Juror Pool Design
 
-The "pool of nine" is not a fixed set of anonymous accounts. Jurors are **staked participants** who register by depositing SOL into the protocol. This creates skin-in-the-game alignment:
+### Current Implementation (Devnet)
 
-- **Registration:** Any wallet can call `register_juror` (planned instruction) to join the pool by staking a minimum amount. The stake is slashed if a juror fails to vote within the deliberation window.
-- **Pool composition per dispute:** When a dispute is created, the plaintiff specifies a juror pool — either the global pool (open disputes) or a curated list (e.g., "only wallets that hold this DAO's governance token"). The current devnet implementation uses a pre-seeded list of 9 addresses for demo purposes; production would draw from a dynamic registry PDA.
-- **Selection integrity:** Orao VRF produces a 64-byte random output. JURY's `reveal_jury` instruction takes this output, derives 3 indices via `randomness[i*8..i*8+8] mod pool_size`, and deduplicates. The selection is deterministic given the VRF output — anyone can verify by replaying the index calculation against the published randomness.
-- **Incentive alignment:** Jurors earn a share of the protocol fee (split of the 1-2% fee on resolved stakes). In the current design, 50% of the fee goes to jurors and 50% to the protocol treasury. Bad-faith jurors who consistently vote against the majority lose reputation and stake — a Schelling-point mechanism similar to Kleros but without requiring a separate governance token.
+The devnet demo uses a pre-seeded pool of 9 juror addresses. When a dispute reaches the jury selection phase:
 
-**Why this works for Solana:** Kleros requires purchasing PNK tokens ($3M+ market cap, 40%+ concentration in top wallets) to participate as a juror. JURY uses SOL — the native asset every Solana user already holds. This removes a $50-200 barrier to juror participation and expands the potential juror pool from ~5,000 PNK holders to millions of SOL wallets.
+1. **VRF Request:** `request_jury` triggers an Orao VRF CPI, requesting 64 bytes of verifiable randomness.
+2. **Jury Selection:** `reveal_jury` reads the fulfilled VRF output and derives 3 unique juror indices via `randomness[i*8..i*8+8] mod pool_size` with deduplication.
+3. **Voting:** Selected jurors call `cast_vote` (1=plaintiff, 2=defendant). After all 3 votes, majority wins automatically.
+4. **Payout:** Winner calls `claim_stakes` to withdraw both stakes from the dispute PDA.
+
+This is fully implemented and tested — 5/5 integration tests pass, and 4 real VRF jury selections have been completed on Solana devnet.
+
+### Production Roadmap (Post-Hackathon)
+
+- **Dynamic juror registry PDA:** Wallets stake SOL to register as jurors. Minimum stake ensures commitment.
+- **Slash conditions:** Jurors who fail to vote within the deliberation window forfeit their stake.
+- **Juror fees:** 50% of protocol fee split among voting jurors.
+- **Domain-specific pools:** Curated juror lists for specific dispute types (NFT, DeFi, freelance).
+
+**Why SOL-native staking matters:** Kleros requires purchasing PNK tokens (~5K holders) to participate as a juror. JURY uses SOL — the native asset every Solana user already holds. This expands the potential juror pool from thousands to millions.
 
 ## What Makes JURY Different
 

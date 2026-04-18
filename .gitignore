@@ -6,3 +6,8 @@ test-ledger/
 .env
 *.log
 .DS_Store
+*.mp4
+*.mp3
+*.wav
+logs/
+.last-progress-share

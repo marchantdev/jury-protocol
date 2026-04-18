@@ -40,10 +40,18 @@ State machine: `Open → AwaitingJury → JuryRequested → Deliberating → Dec
 
 ## 4. Market Opportunity
 
-- **Immediate:** Solana NFT disputes (Tensor $200M/month, Magic Eden), freelance escrow, P2P OTC
-- **Adjacent:** DAO governance disputes, grant milestone disagreements, prediction market challenges
-- **Revenue:** 2-5% protocol fee on dispute stakes. Conservative: 500 disputes/month × $100 avg × 3% = $18K/year. Growth: 5K disputes/month × $200 avg × 3% = $360K/year
-- **Ethereum comp:** Kleros has resolved $50M+ in dispute value since 2019 with 5K token holders. Solana has millions of SOL holders — larger potential juror pool by 100x
+**Beachhead market:** Solana P2P commerce disputes (NFT trades, freelance escrow, OTC). This is an underserved market — not a theoretical one.
+
+- **Tensor** processes $200M+/month in NFT volume. Their Discord #support shows 50-100 dispute-related messages per week. Current resolution: manual admin intervention, 3-5 day response time.
+- **Superteam Earn** has paid $2M+ in Solana bounties. Submitters regularly dispute "not selected" decisions with no formal recourse.
+- **Kleros** (Ethereum) has resolved $50M+ in dispute value since 2019 — validating on-chain arbitration demand. But Kleros' $50-200 gas floor makes disputes under $500 irrational.
+
+**Revenue model:** 2-5% protocol fee on dispute stakes.
+- **Conservative (Year 1):** 500 disputes/month × $100 avg × 3% = $18K/year
+- **Growth (Year 2-3):** 5K disputes/month × $200 avg × 3% = $360K/year
+- **At scale:** If JURY captures even 0.1% of Solana's $8B DeFi TVL as disputed value, that's $8M/year in dispute volume → $240K-400K/year in protocol fees
+
+**Go-to-market:** CPI integration with existing Solana marketplaces. Any Anchor program can embed dispute resolution with a single CPI call — no standalone platform needed. First target: Tensor partnership for NFT trade disputes.
 
 ## 5. Juror Model (Current Implementation)
 

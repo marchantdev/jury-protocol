@@ -1,0 +1,9 @@
+{
+  "name": "jury-vrf-spike",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@switchboard-xyz/solana.js": "^3.0.0",
+    "@solana/web3.js": "^1.98.0"
+  }
+}
