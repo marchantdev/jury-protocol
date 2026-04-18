@@ -8,16 +8,18 @@ On-chain dispute resolution with VRF-based jury selection on Solana. Plaintiff f
 ### Anchor Program (`jury-program/programs/jury-program/src/lib.rs`)
 - **Program ID:** `4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15`
 - **Dispute PDA:** Seeds = `[b"dispute", plaintiff.key(), dispute_id]`
+- **JurorPool PDA:** Seeds = `[b"juror_pool"]` — admin-initialized, read by `reveal_jury`
 - **State machine:** `Open → AwaitingJury → JuryRequested → Deliberating → Decided → Claimed`
 - **Orao VRF CPI:** `request_v2` with 32-byte seed; `reveal_jury` reads fulfilled randomness
 
 ### Instructions
-1. `create_dispute(dispute_id, description, stake_lamports)` — Plaintiff creates dispute, stakes SOL
-2. `join_dispute()` — Defendant joins and matches the stake
-3. `request_jury(vrf_seed)` — CPI to Orao VRF, requests randomness
-4. `reveal_jury(juror_pool)` — Reads VRF result, selects 3 of 9 jurors deterministically
-5. `cast_vote(vote)` — Juror votes (1=plaintiff, 2=defendant); auto-decides after 3 votes
-6. `claim_stakes()` — Winner withdraws combined stakes
+1. `initialize_juror_pool(jurors)` — Admin creates on-chain juror pool PDA (9 addresses)
+2. `create_dispute(dispute_id, description, stake_lamports)` — Plaintiff creates dispute, stakes SOL
+3. `join_dispute()` — Defendant joins and matches the stake
+4. `request_jury(vrf_seed)` — CPI to Orao VRF, requests randomness
+5. `reveal_jury()` — Reads VRF result + on-chain pool PDA, selects 3 of 9 jurors
+6. `cast_vote(vote)` — Juror votes (1=plaintiff, 2=defendant); auto-decides after 3 votes
+7. `claim_stakes()` — Winner withdraws combined stakes
 
 ### Frontend (`jury-app/`)
 - React 19 + Vite 6 + Tailwind CSS 3
@@ -43,7 +45,7 @@ Plaintiff creates dispute → SOL staked in PDA → Defendant joins + stakes
 
 | Feature | Size | % of EXECUTION budget | Status |
 |---------|------|----------------------|--------|
-| Anchor dispute program (6 instructions + state machine) | Large | 50% | Complete |
+| Anchor dispute program (7 instructions + state machine) | Large | 50% | Complete |
 | React frontend (landing + dispute dashboard + wallet) | Medium | 30% | Complete |
 | VRF integration (Orao CPI + jury reveal) | Small | 20% | Complete |
 

@@ -74,10 +74,10 @@ With 3 jurors, a 2-1 split always decides. But if somehow votes are equal (which
 
 ### Test Coverage
 
-- 5 tests in `jury-program.ts`
-- Covers: create_dispute (happy path), join_dispute (happy path + duplicate rejection), zero-stake rejection, description-too-long rejection
-- **Missing:** VRF request/reveal path (requires network), cast_vote (happy + double-vote rejection), claim_stakes (happy + wrong winner rejection)
-- Test coverage is approximately 40% of instructions. The 4 tested cases are all unit-level; the 2 untested instructions (`request_jury`, `reveal_jury`, `cast_vote`, `claim_stakes`) are the program's core value.
+- 6 tests in `jury-program.ts`
+- Covers: initialize_juror_pool (happy path + pool content verification), create_dispute (happy path), join_dispute (happy path + duplicate rejection), zero-stake rejection, description-too-long rejection
+- **Missing:** VRF request/reveal path (requires Orao VRF on localnet), cast_vote (happy + double-vote rejection), claim_stakes (happy + wrong winner rejection)
+- Test coverage is approximately 50% of instructions. The VRF-dependent instructions (`request_jury`, `reveal_jury`) require mocking Orao VRF which is out of scope for hackathon testing.
 
 ---
 
@@ -263,8 +263,8 @@ Now correctly links to `https://github.com/marchantdev/jury-protocol`.
 **M1 — No timeout mechanism.**
 Stuck disputes (defendant never joins, juror never votes) lock funds permanently. Not a demo issue, but relevant for any "real usage" claim.
 
-**M2 — Juror pool is caller-supplied and unverified.**
-`reveal_jury` accepts `juror_pool: [Pubkey; 9]` from the caller. The VRF output selects from this pool, but the pool itself is not on-chain-verified. The three selected jurors are cryptographically random given the pool, but the pool composition is trusted.
+**M2 — Juror pool trust model (RESOLVED Apr 18).**
+Previously `reveal_jury` accepted `juror_pool: [Pubkey; 9]` from the caller. Fixed: `JurorPool` PDA (`seeds = [b"juror_pool"]`) initialized by admin via `initialize_juror_pool`. `reveal_jury` now reads the pool from on-chain state via Anchor account constraints. Deployed to devnet and PDA initialized at `EpWwzK9eZvMLvznumJiS6yjxvNSKeEu729d2ZSGiLjBu`.
 
 **M3 — `useProgram.ts` loses TypeScript type safety.**
 `type JuryProgram = any` bypasses all Anchor-generated types. Runtime errors will be harder to debug.
@@ -301,7 +301,7 @@ If the judge's machine does not have these fonts installed, the UI falls back to
 - [x] Events emitted on every state transition
 - [x] Error codes descriptive with messages
 - [ ] Timeout/abandonment path exists
-- [ ] Juror pool verification on-chain
+- [x] Juror pool verification on-chain (JurorPool PDA)
 - [ ] Account closure on claim_stakes
 - [ ] Test coverage for VRF path, cast_vote, claim_stakes
 
