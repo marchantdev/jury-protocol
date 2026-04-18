@@ -192,7 +192,7 @@ JURY is the first dispute resolution primitive on Solana — infrastructure that
 ## Video Deliverables
 
 - **Technical demo:** 2:35 walkthrough of architecture, VRF evidence, and live frontend ([tech-demo-v2.mp4](tech-demo-v2.mp4))
-- **Pitch video:** In production — problem, solution, demo, market opportunity
+- **Pitch video:** Planned — 3-minute pitch covering problem, solution, live demo, market opportunity (deadline: May 11)
 
 ## GitHub
 
