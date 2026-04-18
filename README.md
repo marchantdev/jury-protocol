@@ -16,9 +16,20 @@ JURY is **not** Kleros on Solana. It introduces two structural innovations that 
 Kleros and Aragon are **standalone platforms** — users leave their dApp, navigate to a separate site, file a dispute there. JURY is **CPI-embeddable**: any Anchor program can invoke dispute resolution directly within its own transaction flow.
 
 ```rust
-// Tensor adds "Dispute this trade" in 3 lines:
-jury_program::cpi::create_dispute(ctx, dispute_id, description, stake)?;
+// From programs/example-escrow — a real, compilable Anchor program:
+use jury_program::cpi::accounts::CreateDispute;
+use jury_program::cpi::create_dispute;
+
+// One CPI call embeds the full dispute lifecycle
+let cpi_accounts = CreateDispute {
+    plaintiff: ctx.accounts.buyer.to_account_info(),
+    dispute: ctx.accounts.dispute.to_account_info(),
+    system_program: ctx.accounts.system_program.to_account_info(),
+};
+create_dispute(CpiContext::new(jury_program, cpi_accounts), id, reason, stake)?;
 ```
+
+**This is not a hypothetical snippet.** See [`programs/example-escrow/`](jury-program/programs/example-escrow/src/lib.rs) — a complete Anchor program that compiles and links against the jury program's CPI interface. Run `anchor build` to verify.
 
 This is the difference between PayPal (a destination) and Stripe (infrastructure). Dispute volume scales with **partner transaction volume**, not JURY's own user acquisition. No other blockchain dispute system is CPI-composable.
 
@@ -77,6 +88,8 @@ State machine: `Open → AwaitingJury → JuryRequested → Deliberating → Dec
 Mean fulfillment: 4.5 slots (~2.5 seconds). Transaction signatures in [`spike-result.md`](spike-result.md).
 
 **Anchor Program:** 527 LOC, 7 instructions, 314KB BPF binary. **Tests:** 6/6 passing (including JurorPool PDA initialization).
+
+**CPI Example:** [`example-escrow`](jury-program/programs/example-escrow/src/lib.rs) — a complete 50-LOC Anchor program demonstrating how an escrow service embeds JURY dispute resolution via a single CPI call. Compiles against `jury_program` with `features = ["cpi"]`.
 
 ## Architecture
 

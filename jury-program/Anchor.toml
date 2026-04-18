@@ -7,9 +7,11 @@ skip-lint = false
 
 [programs.localnet]
 jury_program = "4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15"
+example_escrow = "GRsgA2biJW7qLX5YyHXxX46g2GhcqtpR5UuChuH41s7J"
 
 [programs.devnet]
 jury_program = "4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15"
+example_escrow = "GRsgA2biJW7qLX5YyHXxX46g2GhcqtpR5UuChuH41s7J"
 
 [registry]
 url = "https://api.apr.dev"
