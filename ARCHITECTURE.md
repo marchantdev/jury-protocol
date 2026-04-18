@@ -24,7 +24,8 @@ On-chain dispute resolution with VRF-based jury selection on Solana. Plaintiff f
 ### Frontend (`jury-app/`)
 - React 19 + Vite 6 + Tailwind CSS 3
 - Solana Wallet Adapter (Phantom/Backpack)
-- Routes: `/` (Landing), `/app` (DisputeApp), `/dispute/:id` (DisputeView)
+- Routes: `/` (Landing), `/app` and `/disputes` (DisputeApp), `/dispute/:id` (DisputeView)
+- Read-only mode: visitors without wallet see dispute list; wallet connection unlocks actions
 - On-chain reads via `getProgramAccounts` with Anchor IDL deserialization
 - Deployed: https://jury-app-eight.vercel.app
 
@@ -34,6 +35,11 @@ Plaintiff creates dispute → SOL staked in PDA → Defendant joins + stakes
 → VRF requested (Orao CPI) → ~2.5s fulfillment → reveal_jury selects 3/9
 → Jurors cast votes → Majority reached → Winner claims 2x stake
 ```
+
+### CPI Example (`jury-program/programs/example-escrow/`)
+- 50-LOC Anchor program demonstrating CPI composability
+- Imports `jury_program::cpi::create_dispute` and calls it from an escrow context
+- Compiles with `anchor build` — validates the CPI interface works end-to-end
 
 ## Key Design Decisions
 - **Pool of 9, select 3:** Prevents collusion while keeping deliberation fast

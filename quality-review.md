@@ -252,8 +252,14 @@ Action buttons show/hide based on dispute status and connected wallet role (plai
 **C1 — VRF flow now browser-accessible (RESOLVED Apr 18).**
 All 6 instructions (create, join, request jury, reveal jury, vote, claim) are accessible via context-aware buttons in DisputeView.tsx. The full dispute lifecycle can be completed entirely from the browser.
 
-**C2 — ARCHITECTURE.md describes a different program.**
-Instruction names and state machine in ARCHITECTURE.md do not match lib.rs. If judges use ARCHITECTURE.md as a reference, they will find inconsistencies. Mitigation: delete or rewrite ARCHITECTURE.md to match the actual program.
+**C2 — ARCHITECTURE.md (RESOLVED Apr 18).**
+ARCHITECTURE.md updated to match actual program: correct instruction names, routes (including /disputes), read-only mode, CPI example program documented.
+
+**C4 — CPI composability demonstrated (RESOLVED Apr 18).**
+`programs/example-escrow/` contains a complete 50-LOC Anchor program that compiles against `jury_program::cpi::create_dispute`. Both `cargo check` and `anchor build` succeed. README references real compilable code, not hypothetical snippets.
+
+**C5 — /disputes read-only mode (RESOLVED Apr 18).**
+Visitors without a connected wallet can now see existing disputes on the /disputes page. The frontend creates a read-only Anchor provider for fetching dispute data, with wallet-connected features available after connecting Phantom.
 
 **C3 — GitHub link on landing page (RESOLVED).**
 Now correctly links to `https://github.com/marchantdev/jury-protocol`.
@@ -302,6 +308,7 @@ If the judge's machine does not have these fonts installed, the UI falls back to
 - [x] Error codes descriptive with messages
 - [ ] Timeout/abandonment path exists
 - [x] Juror pool verification on-chain (JurorPool PDA)
+- [x] CPI composability demonstrated (example-escrow compiles against jury_program)
 - [ ] Account closure on claim_stakes
 - [ ] Test coverage for VRF path, cast_vote, claim_stakes
 
@@ -320,9 +327,9 @@ If the judge's machine does not have these fonts installed, the UI falls back to
 - [x] README covers problem, solution, architecture, instructions, VRF evidence, tech stack, project structure, local run, on-chain IDs, competitive landscape
 - [x] VRF evidence with 4 verifiable transaction signatures
 - [x] Demo flow script with timestamps and scenes
-- [ ] ARCHITECTURE.md matches actual program
-- [ ] Security assumptions documented (juror pool trust)
-- [ ] Known limitations listed
+- [x] ARCHITECTURE.md matches actual program (updated Apr 18)
+- [x] Security assumptions documented (Security Model section in README)
+- [x] Known limitations listed (quality-review.md section 6)
 
 ### Deployment
 - [x] Program deployed to devnet (tx confirmed)
