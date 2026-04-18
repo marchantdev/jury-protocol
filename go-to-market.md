@@ -110,26 +110,36 @@ Value proposition to marketplaces: offload dispute resolution to a neutral on-ch
 
 ## 5. Revenue Model
 
-**Protocol fee on resolved disputes:** 1% of total stake on verdict, split between the protocol treasury and the juror pool.
+**Protocol fee on resolved disputes:** 3% of total stake on verdict, split between the protocol treasury (2%) and the juror pool (1%).
 
 Worked example:
-- Two parties stake 1 SOL each (2 SOL total dispute)
-- Protocol collects 0.02 SOL (~$2 at $100 SOL)
-- 0.01 SOL to JURY treasury, 0.01 SOL split among 3 jurors (~$0.33/juror)
-- Net cost per party: $1 + the 1% fee
+- Two parties stake 1 SOL each (2 SOL total dispute = $200 at $100 SOL)
+- Protocol collects 0.06 SOL (~$6)
+- 0.04 SOL to JURY treasury ($4), 0.02 SOL split among 3 jurors (~$0.67/juror)
+- Net cost per party: $100 stake + $3 fee (1.5% per side)
 
-At $100 SOL and 100 disputes/month averaging 1 SOL total stake:
-- Monthly protocol revenue: ~$100
-- At 1,000 disputes/month: ~$1,000/month
+**Revenue projections (conservative — based on Kleros benchmarks):**
 
-This is not the primary revenue lever at hackathon stage — it is the revenue lever at scale. The path to meaningful revenue is:
-1. Drive dispute volume via DAO and marketplace integrations
-2. Increase average stake size by targeting higher-value disputes (grant amounts, not micropayments)
-3. Add a premium tier: expedited juries (9-of-9 instead of 3-of-9) for 2% fee, faster resolution SLA
+| Milestone | Monthly disputes | Avg stake | Protocol rev/month | Annual |
+|-----------|-----------------|-----------|-------------------|--------|
+| Pre-integration (organic) | 200 | $50 | $300 | $3,600 |
+| 1 marketplace partner | 2,000 | $150 | $9,000 | $108,000 |
+| 3 integrations + SDK | 10,000 | $200 | $60,000 | $720,000 |
+| Standard Solana infra | 50,000 | $250 | $375,000 | $4,500,000 |
 
-**Grant revenue (near-term):** Solana Foundation grants, Superteam grants, and ecosystem partner programs. Target $25K–$50K in grants in months 1–3 to fund mainnet operations and SDK development without needing users to generate protocol fees immediately.
+Kleros resolved $50M+ in dispute value since 2019 with $50-200 gas costs on Ethereum (~5K holders). Solana has 100x the user base and 5,000x lower costs. The 2,000 disputes/month milestone requires capturing <0.01% of Tensor's monthly NFT volume as disputed transactions.
 
-**Why this model is defensible:** JURY earns fees only on resolved disputes — zero ongoing cost to integrators who embed the SDK but see low dispute rates. This makes it easy for marketplace operators to say yes to the integration. Revenue scales with protocol usage, not with seat licenses or subscriptions that create friction.
+**Near-term revenue (months 1-6):**
+- Solana Foundation infrastructure grant: $25K-$50K (JURY qualifies as public goods tooling)
+- Superteam ecosystem grant: $5K-$10K
+- Total pre-revenue funding: $30K-$60K — covers mainnet deployment, SDK development, and first integration partnerships
+
+**Premium tier (Month 3+):**
+- Expedited juries (9-of-9 instead of 3-of-9) for 5% fee
+- Custom juror pools (domain experts selected by integrator) for enterprise pricing
+- SLA guarantees: resolution within 24 hours or stake refund
+
+**Why this model is defensible:** JURY earns fees only on resolved disputes — zero ongoing cost to integrators who embed the SDK but see low dispute rates. This makes it easy for marketplace operators to say yes to the integration. Revenue scales with transaction volume of partner platforms, not with JURY's own user acquisition. Once embedded, switching costs are high (contract migration, user trust, juror pool history).
 
 ---
 

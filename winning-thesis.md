@@ -40,16 +40,29 @@ State machine: `Open → AwaitingJury → JuryRequested → Deliberating → Dec
 
 ## 4. Market Opportunity
 
-**Beachhead market:** Solana P2P commerce disputes (NFT trades, freelance escrow, OTC). This is an underserved market — not a theoretical one.
+**JURY is trust infrastructure for Solana commerce — not a standalone dispute app.**
 
-- **Tensor** processes $200M+/month in NFT volume. Their Discord #support shows 50-100 dispute-related messages per week. Current resolution: manual admin intervention, 3-5 day response time.
-- **Superteam Earn** has paid $2M+ in Solana bounties. Submitters regularly dispute "not selected" decisions with no formal recourse.
-- **Kleros** (Ethereum) has resolved $50M+ in dispute value since 2019 — validating on-chain arbitration demand. But Kleros' $50-200 gas floor makes disputes under $500 irrational.
+Every marketplace, escrow, and P2P protocol on Solana needs a neutral resolution layer. Today none exists. JURY fills this gap as embeddable infrastructure (CPI call), not a platform users visit.
 
-**Revenue model:** 2-5% protocol fee on dispute stakes.
-- **Conservative (Year 1):** 500 disputes/month × $100 avg × 3% = $18K/year
-- **Growth (Year 2-3):** 5K disputes/month × $200 avg × 3% = $360K/year
-- **At scale:** If JURY captures even 0.1% of Solana's $8B DeFi TVL as disputed value, that's $8M/year in dispute volume → $240K-400K/year in protocol fees
+**The addressable market is every transaction where two parties need recourse:**
+
+- **NFT marketplaces:** Tensor + Magic Eden process $500M+/month combined. Buyer disputes (counterfeit, not-as-described, failed delivery) are currently handled by centralized support teams — a bottleneck that doesn't scale. JURY replaces this with protocol-level resolution.
+- **Freelance & bounty platforms:** Superteam Earn ($2M+ paid), Solana bounties, and the growing P2P service economy. "Did you deliver what was agreed?" is the #1 dispute category, and currently resolved by platform admins or not at all.
+- **DeFi escrow:** OTC desks, conditional payments, milestone-based vesting. Any smart contract that holds funds pending a condition can embed JURY as the arbiter when parties disagree.
+- **Kleros validation:** Kleros has resolved $50M+ in dispute value on Ethereum since 2019 with $50-200 gas costs. This proves demand. JURY at $0.01/tx unlocks the entire sub-$500 dispute category that Kleros can't serve.
+
+**Revenue model:** 2-5% protocol fee on dispute stakes, paid automatically on verdict.
+
+| Scenario | Disputes/month | Avg stake | Fee | Annual revenue |
+|----------|---------------|-----------|-----|---------------|
+| Launch (6 months) | 200 | $50 | 3% | $3,600 |
+| Year 1 (1 marketplace integration) | 2,000 | $150 | 3% | $108,000 |
+| Year 2 (3 integrations + SDK) | 10,000 | $200 | 3% | $720,000 |
+| At scale (standard Solana infra) | 50,000 | $250 | 3% | $4,500,000 |
+
+The inflection point is the first marketplace integration. When Tensor or Magic Eden embeds JURY, every NFT trade gets a "Dispute" button — dispute volume scales with transaction volume, not with JURY's own user acquisition. This is the Stripe model: invisible infrastructure that earns on usage.
+
+**Near-term revenue (months 1-6):** Solana Foundation infrastructure grant ($25K-$50K) + Superteam ecosystem grant ($5K-$10K). JURY qualifies as public goods tooling. These grants fund mainnet deployment and SDK development without requiring organic dispute volume.
 
 **Go-to-market:** CPI integration with existing Solana marketplaces. Any Anchor program can embed dispute resolution with a single CPI call — no standalone platform needed. First target: Tensor partnership for NFT trade disputes.
 

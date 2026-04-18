@@ -2,23 +2,23 @@
 
 ## Video Target: 60-90 seconds
 
-### Scene 1: The Problem (0:00–0:10)
+### Scene 1: The Problem (0:00–0:12)
 
-**Display text:** "Disputes in crypto resolve through centralized arbitration. The platform decides. You can't verify. You can't appeal."
+**Display text:** "You bought an NFT. The seller didn't deliver. You lost $200. There's no on-chain recourse."
 
-**Phonetic voiceover:** "Disputes in crypto resolve through centralized arbitration. The platform decides. You can't verify. You can't appeal."
+**Phonetic voiceover:** "You bought an N-F-T. The seller didn't deliver. You lost two hundred dollars. On Saul-ah-nah, there's no on-chain recourse. No dispute button. No neutral arbiter. Just eat the loss — or trust a centralized platform to decide."
 
-**Visual:** Dark background with text appearing, then a slash through "centralized arbitration"
+**Visual:** Dark background. Text appears line by line. Brief flash of a Discord #support message saying "Sorry, we can't help with this."
 
 ---
 
-### Scene 2: The Solution (0:10–0:20)
+### Scene 2: The Solution (0:12–0:22)
 
-**Display text:** "JURY — On-chain dispute resolution with verifiably random juries on Solana"
+**Display text:** "JURY — Disputes settled in 30 seconds by verifiably random juries on Solana"
 
-**Phonetic voiceover:** "Jury. On-chain dispute resolution with verifiably random juries on Saul-ah-nah."
+**Phonetic voiceover:** "Meet Jury. Stake saul. A jury of three is selected in two point five seconds using verifiable randomness. They vote. Majority wins. Winner claims the stakes. Thirty seconds. One cent."
 
-**Visual:** JURY logo appears, landing page loads showing the "How It Works" section
+**Visual:** JURY landing page loads, quick scroll past "How It Works" cards, then zoom into the cost comparison: Kleros $50-200 vs JURY $0.01
 
 ---
 
