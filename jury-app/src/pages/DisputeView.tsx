@@ -51,6 +51,19 @@ export default function DisputeView() {
       .finally(() => setLoading(false));
   }, [program, id]);
 
+  // Auto-poll every 5s for active disputes (not yet claimed)
+  useEffect(() => {
+    if (!program || !id || !dispute) return;
+    const si = statusToIndex(dispute.status);
+    if (si >= 5) return; // Claimed — no need to poll
+    const interval = setInterval(() => {
+      fetchDispute(program, new PublicKey(id))
+        .then((d) => { if (d) setDispute(d); })
+        .catch(() => {}); // Silently ignore poll errors
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [program, id, dispute?.status]);
+
   const runAction = useCallback(async (label: string, fn: () => Promise<string>) => {
     setActionLoading(true);
     setActionMsg(null);
