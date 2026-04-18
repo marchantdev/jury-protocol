@@ -25,6 +25,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/app" element={<DisputeApp />} />
+              <Route path="/disputes" element={<DisputeApp />} />
               <Route path="/dispute/:id" element={<DisputeView />} />
             </Routes>
           </BrowserRouter>

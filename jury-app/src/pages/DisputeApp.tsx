@@ -29,23 +29,25 @@ export default function DisputeApp() {
       </header>
 
       <div className="max-w-3xl mx-auto px-6 py-8">
-        {!connected ? (
-          <div className="card text-center py-12">
-            <Scale className="text-jury-green mx-auto mb-4" size={40} />
-            <h2 className="text-xl font-bold text-jury-text mb-2">Connect your wallet</h2>
-            <p className="text-jury-muted mb-6">Connect a Solana wallet to create or join disputes.</p>
-            <WalletMultiButton />
-          </div>
-        ) : showCreate ? (
+        {connected && showCreate ? (
           <CreateDispute onBack={() => setShowCreate(false)} />
         ) : (
           <>
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold text-jury-text">Disputes</h1>
-              <button className="btn-primary flex items-center gap-2" onClick={() => setShowCreate(true)}>
-                <Plus size={16} /> New Dispute
-              </button>
+              {connected && (
+                <button className="btn-primary flex items-center gap-2" onClick={() => setShowCreate(true)}>
+                  <Plus size={16} /> New Dispute
+                </button>
+              )}
             </div>
+            {!connected && (
+              <div className="card text-center py-6 mb-6 border-jury-green/20">
+                <Scale className="text-jury-green mx-auto mb-3" size={28} />
+                <p className="text-jury-muted text-sm mb-3">Connect a Solana wallet to create or join disputes.</p>
+                <WalletMultiButton />
+              </div>
+            )}
             <DisputeList />
           </>
         )}
@@ -157,17 +159,18 @@ function CreateDispute({ onBack }: { onBack: () => void }) {
 }
 
 function DisputeList() {
-  const { program } = useProgram();
+  const { program, readOnlyProgram } = useProgram();
+  const activeProgram = program || readOnlyProgram;
   const [disputes, setDisputes] = useState<DisputeAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadDisputes = useCallback(async () => {
-    if (!program) return;
+    if (!activeProgram) return;
     setLoading(true);
     setError(null);
     try {
-      const all = await fetchAllDisputes(program);
+      const all = await fetchAllDisputes(activeProgram);
       // Sort by created_at descending
       all.sort((a, b) => b.createdAt.toNumber() - a.createdAt.toNumber());
       setDisputes(all);
@@ -177,7 +180,7 @@ function DisputeList() {
     } finally {
       setLoading(false);
     }
-  }, [program]);
+  }, [activeProgram]);
 
   useEffect(() => {
     loadDisputes();

@@ -23,6 +23,13 @@ export const DEVNET_JUROR_POOL: PublicKey[] = [
   new PublicKey("4TpUJx9YQV6DLhdWnMbpwYzk3sCqXLT5RnPYZnYqJ6bP"),
 ];
 
+// Dummy wallet for read-only Anchor provider (never signs, only reads)
+const READ_ONLY_WALLET = {
+  publicKey: PublicKey.default,
+  signTransaction: async (tx: any) => tx,
+  signAllTransactions: async (txs: any) => txs,
+};
+
 export function useProgram() {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
@@ -35,7 +42,15 @@ export function useProgram() {
     return new Program(IDL as any, provider) as Program<JuryProgram>;
   }, [connection, wallet]);
 
-  return { program, connection };
+  // Read-only program available even without wallet (for fetching disputes)
+  const readOnlyProgram = useMemo(() => {
+    const provider = new AnchorProvider(connection, READ_ONLY_WALLET as any, {
+      commitment: "confirmed",
+    });
+    return new Program(IDL as any, provider) as Program<JuryProgram>;
+  }, [connection]);
+
+  return { program, readOnlyProgram, connection };
 }
 
 export async function createDisputeTx(
