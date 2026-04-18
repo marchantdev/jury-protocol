@@ -34,7 +34,7 @@ export default function Landing() {
             <Link to="/app" className="btn-primary text-base px-6 py-3">
               Open a Dispute
             </Link>
-            <a href="https://github.com" target="_blank" rel="noopener" className="btn-secondary text-base px-6 py-3">
+            <a href="https://github.com/marchantdev/jury-protocol" target="_blank" rel="noopener" className="btn-secondary text-base px-6 py-3">
               View Source
             </a>
           </div>

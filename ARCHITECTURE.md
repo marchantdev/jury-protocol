@@ -1,35 +1,46 @@
 # Jury — Architecture
 
 ## Overview
-On-chain dispute resolution with VRF-based jury selection on Solana.
+On-chain dispute resolution with VRF-based jury selection on Solana. Plaintiff files a dispute and stakes SOL; defendant joins and matches the stake. Three jurors are selected from a pool of nine via Orao VRF. Majority verdict wins; winner claims both stakes.
 
 ## Components
 
-### Anchor Program (`programs/jury/`)
-- **DisputePDA**: Stores dispute state (parties, evidence hash, status, verdict)
-- **JurorPDA**: Per-juror assignment record (juror pubkey, VRF seed, commitment)
-- **State machine**: Open → JurySelected → Deliberating → Verdict
-- **Orao VRF CPI**: Requests randomness for jury selection; fulfillment triggers `select_jury` instruction
+### Anchor Program (`jury-program/programs/jury-program/src/lib.rs`)
+- **Program ID:** `4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15`
+- **Dispute PDA:** Seeds = `[b"dispute", plaintiff.key(), dispute_id]`
+- **State machine:** `Open → AwaitingJury → JuryRequested → Deliberating → Decided → Claimed`
+- **Orao VRF CPI:** `request_v2` with 32-byte seed; `reveal_jury` reads fulfilled randomness
 
 ### Instructions
-1. `open_dispute(respondent, evidence_hash, stake)` → creates DisputePDA, locks stake
-2. `request_jury(dispute)` → CPIs to Orao VRF, stores pending request
-3. `fulfill_jury(vrf_result)` → called by Orao fulfiller, selects N jurors deterministically
-4. `submit_vote(dispute, juror, vote)` → records juror vote commitment
-5. `finalize_verdict(dispute)` → tallies votes, releases stake to winning party
+1. `create_dispute(dispute_id, description, stake_lamports)` — Plaintiff creates dispute, stakes SOL
+2. `join_dispute()` — Defendant joins and matches the stake
+3. `request_jury(vrf_seed)` — CPI to Orao VRF, requests randomness
+4. `reveal_jury(juror_pool)` — Reads VRF result, selects 3 of 9 jurors deterministically
+5. `cast_vote(vote)` — Juror votes (1=plaintiff, 2=defendant); auto-decides after 3 votes
+6. `claim_stakes()` — Winner withdraws combined stakes
 
-### Frontend (`frontend/`)
-- React + Vite + Tailwind
-- Wallet adapter (Phantom/Backpack)
-- Three screens: OpenDispute → JuryWatch → VerdictView
-- Polls dispute account every 2s for state changes
+### Frontend (`jury-app/`)
+- React 19 + Vite 6 + Tailwind CSS 3
+- Solana Wallet Adapter (Phantom/Backpack)
+- Routes: `/` (Landing), `/app` (DisputeApp), `/dispute/:id` (DisputeView)
+- On-chain reads via `getProgramAccounts` with Anchor IDL deserialization
+- Deployed: https://jury-app-eight.vercel.app
 
 ### Data Flow
 ```
-User opens dispute → Anchor locks stake → VRF requested → Orao fulfills
-→ Jury selected → Jurors vote → Verdict finalized → Stake released
+Plaintiff creates dispute → SOL staked in PDA → Defendant joins + stakes
+→ VRF requested (Orao CPI) → ~2.5s fulfillment → reveal_jury selects 3/9
+→ Jurors cast votes → Majority reached → Winner claims 2x stake
 ```
 
+## Key Design Decisions
+- **Pool of 9, select 3:** Prevents collusion while keeping deliberation fast
+- **Deterministic selection from VRF:** `randomness[i] % 9` with dedup loop, up to 64 bytes
+- **Auto-verdict on 3rd vote:** No separate finalize step; `cast_vote` transitions to Decided
+- **PDA as escrow:** Stakes locked in dispute account, no separate vault
+
 ## Devnet Deployment
-- Program ID: (assigned after `anchor deploy`)
-- Orao VRF devnet: `VRFzZoJdhFWL8rkvu87LpKM3RbcVezpMEc6X5GVDr7y`
+- Program ID: `4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15`
+- Orao VRF: `VRFzZoJdhFWL8rkvu87LpKM3RbcVezpMEc6X5GVDr7y`
+- Network: Solana Devnet
+- Explorer: https://explorer.solana.com/address/4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15?cluster=devnet
