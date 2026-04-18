@@ -6,6 +6,7 @@ export const PROGRAM_ID = new PublicKey(
 
 export const DISPUTE_SEED = Buffer.from("dispute");
 export const JUROR_POOL_SEED = Buffer.from("juror_pool");
+export const EVIDENCE_SEED = Buffer.from("evidence");
 
 export function getJurorPoolPDA(): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
@@ -31,6 +32,7 @@ export const STATUS_LABELS: Record<number, string> = {
   3: "Deliberating",
   4: "Decided",
   5: "Claimed",
+  6: "Expired",
 };
 
 export const STATUS_COLORS: Record<number, string> = {
@@ -40,6 +42,7 @@ export const STATUS_COLORS: Record<number, string> = {
   3: "#00ffa3",    // green
   4: "#22c55e",    // emerald
   5: "#6b7280",    // gray
+  6: "#ef4444",    // red
 };
 
 export function statusToIndex(status: any): number {
@@ -50,5 +53,6 @@ export function statusToIndex(status: any): number {
   if (status?.deliberating !== undefined) return 3;
   if (status?.decided !== undefined) return 4;
   if (status?.claimed !== undefined) return 5;
+  if (status?.expired !== undefined) return 6;
   return -1;
 }

@@ -4,28 +4,34 @@ use orao_solana_vrf::state::NetworkState;
 use orao_solana_vrf::CONFIG_ACCOUNT_SEED;
 use orao_solana_vrf::RANDOMNESS_ACCOUNT_SEED;
 
-declare_id!("4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15");
+declare_id!("AyLgnN3s5QdhVEQ6qzSXGarUW786tnrmgdsHS19oABxT");
 
 pub const DISPUTE_SEED: &[u8] = b"dispute";
 pub const JUROR_POOL_SEED: &[u8] = b"juror_pool";
-pub const JURY_POOL_SIZE: u8 = 9;
+pub const EVIDENCE_SEED: &[u8] = b"evidence";
+pub const MAX_JUROR_POOL: u8 = 32;
 pub const JURY_SIZE: u8 = 3;
+pub const DEFAULT_DEADLINE_SECS: i64 = 7 * 24 * 60 * 60; // 7 days
+pub const MAX_EVIDENCE_URI: usize = 256;
 
 #[program]
 pub mod jury_program {
     use orao_solana_vrf::cpi::accounts::RequestV2;
     use super::*;
 
-    /// Create a new dispute between two parties.
-    /// Both parties stake SOL; the loser forfeits their stake.
+    /// Create a new dispute. deadline_seconds: 0 = 7 days default.
     pub fn create_dispute(
         ctx: Context<CreateDispute>,
         dispute_id: [u8; 32],
         description: String,
         stake_lamports: u64,
+        deadline_seconds: i64,
     ) -> Result<()> {
         require!(description.len() <= 256, JuryError::DescriptionTooLong);
         require!(stake_lamports > 0, JuryError::ZeroStake);
+
+        let now = Clock::get()?.unix_timestamp;
+        let dl = if deadline_seconds > 0 { deadline_seconds } else { DEFAULT_DEADLINE_SECS };
 
         let dispute = &mut ctx.accounts.dispute;
         dispute.id = dispute_id;
@@ -37,11 +43,12 @@ pub mod jury_program {
         dispute.jury = [Pubkey::default(); 3];
         dispute.votes = [0u8; 3];
         dispute.vrf_seed = [0u8; 32];
-        dispute.created_at = Clock::get()?.unix_timestamp;
+        dispute.created_at = now;
+        dispute.deadline = now + dl;
+        dispute.evidence_count = 0;
         dispute.bump = ctx.bumps.dispute;
         dispute.winner = 0;
 
-        // Transfer plaintiff's stake to dispute PDA
         anchor_lang::system_program::transfer(
             CpiContext::new(
                 ctx.accounts.system_program.to_account_info(),
@@ -123,37 +130,56 @@ pub mod jury_program {
         Ok(())
     }
 
-    /// Initialize the on-chain juror pool. Only the admin can set the pool.
-    /// This replaces the previous caller-supplied pool, fixing the trust model.
-    pub fn initialize_juror_pool(
-        ctx: Context<InitializeJurorPool>,
-        jurors: [Pubkey; 9],
-    ) -> Result<()> {
+    /// Initialize the on-chain juror pool. Admin creates it; anyone can register after.
+    pub fn initialize_juror_pool(ctx: Context<InitializeJurorPool>) -> Result<()> {
         let pool = &mut ctx.accounts.juror_pool;
         pool.admin = ctx.accounts.admin.key();
-        pool.jurors = jurors;
+        pool.count = 0;
+        pool.jurors = [Pubkey::default(); 32];
         pool.bump = ctx.bumps.juror_pool;
 
         Ok(())
     }
 
+    /// Open registration: any wallet can register as a juror.
+    pub fn register_juror(ctx: Context<RegisterJuror>) -> Result<()> {
+        let pool = &mut ctx.accounts.juror_pool;
+        let count = pool.count as usize;
+        require!(pool.count < MAX_JUROR_POOL, JuryError::JurorPoolFull);
+
+        let juror = ctx.accounts.juror.key();
+        for i in 0..count {
+            require!(pool.jurors[i] != juror, JuryError::AlreadyRegistered);
+        }
+
+        pool.jurors[count] = juror;
+        pool.count += 1;
+
+        emit!(JurorRegistered {
+            juror,
+            pool_size: pool.count,
+        });
+
+        Ok(())
+    }
+
     /// Reveal the jury after VRF fulfillment.
-    /// Reads juror pool from on-chain PDA — not caller-supplied.
-    pub fn reveal_jury(
-        ctx: Context<RevealJury>,
-    ) -> Result<()> {
+    pub fn reveal_jury(ctx: Context<RevealJury>) -> Result<()> {
         let dispute = &mut ctx.accounts.dispute;
         require!(dispute.status == DisputeStatus::JuryRequested, JuryError::InvalidStatus);
 
         let juror_pool = &ctx.accounts.juror_pool;
+        require!(juror_pool.count >= JURY_SIZE, JuryError::InsufficientJurors);
+
         let random_data = &ctx.accounts.random;
         let randomness = get_fulfilled_randomness(random_data)?;
 
+        let pool_size = juror_pool.count;
         let mut selected = [0u8; 3];
         let mut count = 0usize;
         let mut i = 0usize;
         while count < 3 && i < 64 {
-            let idx = randomness[i] % JURY_POOL_SIZE;
+            let idx = randomness[i] % pool_size;
             let mut is_dup = false;
             for j in 0..count {
                 if selected[j] == idx {
@@ -260,6 +286,101 @@ pub mod jury_program {
 
         Ok(())
     }
+
+    /// Append an evidence URI to the dispute log. Only plaintiff or defendant may call.
+    /// Creates a separate EvidenceEntry PDA per submission (append-only).
+    pub fn submit_evidence(
+        ctx: Context<SubmitEvidenceUri>,
+        uri: String,
+    ) -> Result<()> {
+        require!(uri.len() <= MAX_EVIDENCE_URI, JuryError::EvidenceUriTooLong);
+        require!(!uri.is_empty(), JuryError::EvidenceUriTooLong);
+
+        let dispute = &mut ctx.accounts.dispute;
+        require!(
+            dispute.status == DisputeStatus::Open
+                || dispute.status == DisputeStatus::AwaitingJury
+                || dispute.status == DisputeStatus::JuryRequested
+                || dispute.status == DisputeStatus::Deliberating,
+            JuryError::InvalidStatus
+        );
+
+        let party = ctx.accounts.party.key();
+        require!(
+            party == dispute.plaintiff || party == dispute.defendant,
+            JuryError::NotAParty
+        );
+
+        let entry = &mut ctx.accounts.evidence_entry;
+        entry.dispute = dispute.key();
+        entry.party = party;
+        entry.uri = uri.clone();
+        entry.submitted_at = Clock::get()?.unix_timestamp;
+        entry.index = dispute.evidence_count;
+        entry.bump = ctx.bumps.evidence_entry;
+
+        dispute.evidence_count += 1;
+
+        emit!(EvidenceSubmitted {
+            dispute_id: dispute.id,
+            party,
+            uri,
+            index: entry.index,
+        });
+
+        Ok(())
+    }
+
+    /// Test helper: admin sets jury directly, advancing dispute to Deliberating.
+    /// Bypasses VRF so cast_vote/claim_stakes can be tested on localnet.
+    pub fn debug_set_jury(
+        ctx: Context<DebugSetJury>,
+        jury: [Pubkey; 3],
+    ) -> Result<()> {
+        let dispute = &mut ctx.accounts.dispute;
+        require!(dispute.status == DisputeStatus::AwaitingJury, JuryError::InvalidStatus);
+
+        dispute.jury = jury;
+        dispute.status = DisputeStatus::Deliberating;
+
+        Ok(())
+    }
+
+    /// Expire a dispute that has passed its deadline.
+    /// Returns stakes to both parties. Anyone can call this.
+    pub fn expire_dispute(ctx: Context<ExpireDispute>) -> Result<()> {
+        let dispute = &mut ctx.accounts.dispute;
+        require!(
+            dispute.status != DisputeStatus::Decided
+                && dispute.status != DisputeStatus::Claimed
+                && dispute.status != DisputeStatus::Expired,
+            JuryError::InvalidStatus
+        );
+
+        let now = Clock::get()?.unix_timestamp;
+        require!(now > dispute.deadline, JuryError::DeadlineNotReached);
+
+        let plaintiff_info = ctx.accounts.plaintiff.to_account_info();
+        let dispute_info = dispute.to_account_info();
+
+        if dispute.defendant != Pubkey::default() {
+            let defendant_info = ctx.accounts.defendant.to_account_info();
+            **dispute_info.try_borrow_mut_lamports()? -= dispute.stake_lamports * 2;
+            **plaintiff_info.try_borrow_mut_lamports()? += dispute.stake_lamports;
+            **defendant_info.try_borrow_mut_lamports()? += dispute.stake_lamports;
+        } else {
+            **dispute_info.try_borrow_mut_lamports()? -= dispute.stake_lamports;
+            **plaintiff_info.try_borrow_mut_lamports()? += dispute.stake_lamports;
+        }
+
+        dispute.status = DisputeStatus::Expired;
+
+        emit!(DisputeExpired {
+            dispute_id: dispute.id,
+        });
+
+        Ok(())
+    }
 }
 
 // ─── Accounts ────────────────────────────────────────────
@@ -342,6 +463,18 @@ pub struct InitializeJurorPool<'info> {
 }
 
 #[derive(Accounts)]
+pub struct RegisterJuror<'info> {
+    #[account(mut)]
+    pub juror: Signer<'info>,
+    #[account(
+        mut,
+        seeds = [JUROR_POOL_SEED],
+        bump = juror_pool.bump,
+    )]
+    pub juror_pool: Account<'info, JurorPool>,
+}
+
+#[derive(Accounts)]
 pub struct RevealJury<'info> {
     #[account(
         mut,
@@ -386,39 +519,111 @@ pub struct ClaimStakes<'info> {
     pub dispute: Account<'info, Dispute>,
 }
 
+#[derive(Accounts)]
+pub struct DebugSetJury<'info> {
+    pub admin: Signer<'info>,
+    #[account(
+        mut,
+        seeds = [DISPUTE_SEED, dispute.plaintiff.as_ref(), dispute.id.as_ref()],
+        bump = dispute.bump,
+    )]
+    pub dispute: Account<'info, Dispute>,
+}
+
+#[derive(Accounts)]
+#[instruction(uri: String)]
+pub struct SubmitEvidenceUri<'info> {
+    #[account(mut)]
+    pub party: Signer<'info>,
+    #[account(
+        mut,
+        seeds = [DISPUTE_SEED, dispute.plaintiff.as_ref(), dispute.id.as_ref()],
+        bump = dispute.bump,
+    )]
+    pub dispute: Account<'info, Dispute>,
+    #[account(
+        init,
+        payer = party,
+        space = 8 + EvidenceEntry::SIZE,
+        seeds = [EVIDENCE_SEED, dispute.key().as_ref(), &[dispute.evidence_count]],
+        bump,
+    )]
+    pub evidence_entry: Account<'info, EvidenceEntry>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct ExpireDispute<'info> {
+    #[account(
+        mut,
+        seeds = [DISPUTE_SEED, dispute.plaintiff.as_ref(), dispute.id.as_ref()],
+        bump = dispute.bump,
+    )]
+    pub dispute: Account<'info, Dispute>,
+    /// CHECK: plaintiff receives refund
+    #[account(
+        mut,
+        constraint = plaintiff.key() == dispute.plaintiff @ JuryError::InvalidParty,
+    )]
+    pub plaintiff: AccountInfo<'info>,
+    /// CHECK: defendant receives refund (or default pubkey if not joined)
+    #[account(mut)]
+    pub defendant: AccountInfo<'info>,
+}
+
 // ─── State ───────────────────────────────────────────────
 
 #[account]
 pub struct Dispute {
-    pub id: [u8; 32],
-    pub plaintiff: Pubkey,
-    pub defendant: Pubkey,
-    pub description: String,
-    pub stake_lamports: u64,
-    pub status: DisputeStatus,
-    pub jury: [Pubkey; 3],
-    pub votes: [u8; 3],
-    pub vrf_seed: [u8; 32],
-    pub winner: u8,
-    pub created_at: i64,
-    pub bump: u8,
+    pub id: [u8; 32],          // 32
+    pub plaintiff: Pubkey,     // 32
+    pub defendant: Pubkey,     // 32
+    pub description: String,   // 4+256
+    pub stake_lamports: u64,   // 8
+    pub status: DisputeStatus, // 1
+    pub jury: [Pubkey; 3],     // 96
+    pub votes: [u8; 3],        // 3
+    pub vrf_seed: [u8; 32],    // 32
+    pub winner: u8,            // 1
+    pub created_at: i64,       // 8
+    pub deadline: i64,         // 8
+    pub evidence_count: u8,    // 1
+    pub bump: u8,              // 1
 }
 
 impl Dispute {
-    pub const SIZE: usize = 32 + 32 + 32 + (4 + 256) + 8 + 1 + (32 * 3) + 3 + 32 + 1 + 8 + 1;
+    // 32+32+32+(4+256)+8+1+96+3+32+1+8+8+1+1 = 515
+    pub const SIZE: usize = 32 + 32 + 32 + (4 + 256) + 8 + 1 + (32 * 3) + 3 + 32 + 1 + 8 + 8 + 1 + 1;
 }
 
-/// On-chain juror pool — stores registered juror addresses.
-/// Initialized by admin, read by reveal_jury. Replaces caller-supplied pool.
+/// On-chain juror pool — open registration, up to 32 jurors.
 #[account]
 pub struct JurorPool {
-    pub admin: Pubkey,
-    pub jurors: [Pubkey; 9],
-    pub bump: u8,
+    pub admin: Pubkey,          // 32
+    pub count: u8,              // 1
+    pub jurors: [Pubkey; 32],   // 1024
+    pub bump: u8,               // 1
 }
 
 impl JurorPool {
-    pub const SIZE: usize = 32 + (32 * 9) + 1; // admin + 9 jurors + bump
+    // 32 + 1 + (32*32) + 1 = 1058
+    pub const SIZE: usize = 32 + 1 + (32 * 32) + 1;
+}
+
+/// Append-only evidence entry. One PDA per evidence submission.
+#[account]
+pub struct EvidenceEntry {
+    pub dispute: Pubkey,    // 32
+    pub party: Pubkey,      // 32
+    pub uri: String,        // 4+256
+    pub submitted_at: i64,  // 8
+    pub index: u8,          // 1
+    pub bump: u8,           // 1
+}
+
+impl EvidenceEntry {
+    // 32+32+(4+256)+8+1+1 = 334
+    pub const SIZE: usize = 32 + 32 + (4 + 256) + 8 + 1 + 1;
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
@@ -429,6 +634,7 @@ pub enum DisputeStatus {
     Deliberating,
     Decided,
     Claimed,
+    Expired,
 }
 
 // ─── Errors ──────────────────────────────────────────────
@@ -457,6 +663,22 @@ pub enum JuryError {
     NotTheWinner,
     #[msg("VRF randomness not yet fulfilled")]
     RandomnessNotFulfilled,
+    #[msg("Signer is not a party to this dispute")]
+    NotAParty,
+    #[msg("Dispute deadline has not been reached")]
+    DeadlineNotReached,
+    #[msg("Unauthorized: only admin can perform this action")]
+    Unauthorized,
+    #[msg("Invalid party account")]
+    InvalidParty,
+    #[msg("Juror pool is full")]
+    JurorPoolFull,
+    #[msg("Already registered as juror")]
+    AlreadyRegistered,
+    #[msg("Not enough jurors registered")]
+    InsufficientJurors,
+    #[msg("Evidence URI too long or empty")]
+    EvidenceUriTooLong,
 }
 
 // ─── Events ──────────────────────────────────────────────
@@ -506,6 +728,25 @@ pub struct StakesClaimed {
     pub dispute_id: [u8; 32],
     pub winner: Pubkey,
     pub amount: u64,
+}
+
+#[event]
+pub struct EvidenceSubmitted {
+    pub dispute_id: [u8; 32],
+    pub party: Pubkey,
+    pub uri: String,
+    pub index: u8,
+}
+
+#[event]
+pub struct DisputeExpired {
+    pub dispute_id: [u8; 32],
+}
+
+#[event]
+pub struct JurorRegistered {
+    pub juror: Pubkey,
+    pub pool_size: u8,
 }
 
 // ─── Helpers ─────────────────────────────────────────────

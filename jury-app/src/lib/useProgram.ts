@@ -3,25 +3,12 @@ import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
 import { Program, AnchorProvider, BN } from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import IDL from "./idl.json";
-import { PROGRAM_ID, DISPUTE_SEED, getJurorPoolPDA } from "./program";
+import { PROGRAM_ID, DISPUTE_SEED, EVIDENCE_SEED, getJurorPoolPDA } from "./program";
 
 // Anchor 0.30+ IDL type
 type JuryProgram = any;
 
 const ORAO_VRF_ID = new PublicKey("VRFzZoJdhFWL8rkvu87LpKM3RbcVezpMEc6X5GVDr7y");
-
-// Pre-seeded juror pool for devnet demo (9 addresses)
-export const DEVNET_JUROR_POOL: PublicKey[] = [
-  new PublicKey("GpXHXs5KfzfXbNKcMLNbAMsJsgPsBE7y5GtwVoiuxYvH"),
-  new PublicKey("3Kk7VEYXGRqKWZmFZMbECKhJqyaGQjsKYZLAPBRZ2Qfn"),
-  new PublicKey("7x6VZPjwqNJ8Cg1JZfGmWGqS5k3CVD9cRYxQq5F2cYV"),
-  new PublicKey("9dWLBCbvQEWjCX2qKs9YBtHFXYqJGdMrTgKNm8jMUeAQ"),
-  new PublicKey("5fvPFGCEKzZ5S5JJNWzFNfMq9gCLRrUDwTf6Ly6RYp7X"),
-  new PublicKey("BqJHrZ4r3RWxJBbGSCRv3xJgFiupGJP8J7T4g5QXaEQ2"),
-  new PublicKey("FNVBz5rJUVfePjGndMQKoYTqxZx4wfNpT3N4fJKTPbAs"),
-  new PublicKey("HGjd3fNVWJNkqJHfD7qYQnSr5y9oRBMepqfFSMAqK7cM"),
-  new PublicKey("4TpUJx9YQV6DLhdWnMbpwYzk3sCqXLT5RnPYZnYqJ6bP"),
-];
 
 // Dummy wallet for read-only Anchor provider (never signs, only reads)
 const READ_ONLY_WALLET = {
@@ -42,7 +29,6 @@ export function useProgram() {
     return new Program(IDL as any, provider) as Program<JuryProgram>;
   }, [connection, wallet]);
 
-  // Read-only program available even without wallet (for fetching disputes)
   const readOnlyProgram = useMemo(() => {
     const provider = new AnchorProvider(connection, READ_ONLY_WALLET as any, {
       commitment: "confirmed",
@@ -57,13 +43,14 @@ export async function createDisputeTx(
   program: Program<JuryProgram>,
   plaintiff: PublicKey,
   description: string,
-  stakeSol: number
+  stakeSol: number,
+  deadlineSeconds: number = 0
 ): Promise<string> {
-  // Generate a random 32-byte dispute ID
   const disputeId = new Uint8Array(32);
   crypto.getRandomValues(disputeId);
 
   const stakeLamports = new BN(Math.floor(stakeSol * LAMPORTS_PER_SOL));
+  const deadline = new BN(deadlineSeconds);
 
   const [disputePDA] = PublicKey.findProgramAddressSync(
     [DISPUTE_SEED, plaintiff.toBytes(), disputeId],
@@ -71,7 +58,7 @@ export async function createDisputeTx(
   );
 
   const sig = await (program.methods as any)
-    .createDispute(Array.from(disputeId), description, stakeLamports)
+    .createDispute(Array.from(disputeId), description, stakeLamports, deadline)
     .accounts({
       plaintiff,
       dispute: disputePDA,
@@ -95,6 +82,18 @@ export interface DisputeAccount {
   vrfSeed: number[];
   winner: number;
   createdAt: BN;
+  deadline: BN;
+  evidenceCount: number;
+  bump: number;
+}
+
+export interface EvidenceEntryAccount {
+  publicKey: PublicKey;
+  dispute: PublicKey;
+  party: PublicKey;
+  uri: string;
+  submittedAt: BN;
+  index: number;
   bump: number;
 }
 
@@ -118,6 +117,27 @@ export async function fetchDispute(
   } catch {
     return null;
   }
+}
+
+export async function fetchEvidenceEntries(
+  program: Program<JuryProgram>,
+  disputePDA: PublicKey,
+  count: number
+): Promise<EvidenceEntryAccount[]> {
+  const entries: EvidenceEntryAccount[] = [];
+  for (let i = 0; i < count; i++) {
+    const [evidencePDA] = PublicKey.findProgramAddressSync(
+      [EVIDENCE_SEED, disputePDA.toBytes(), new Uint8Array([i])],
+      PROGRAM_ID
+    );
+    try {
+      const account = await (program.account as any).evidenceEntry.fetch(evidencePDA);
+      entries.push({ publicKey: evidencePDA, ...account } as EvidenceEntryAccount);
+    } catch {
+      // Entry may not exist yet
+    }
+  }
+  return entries;
 }
 
 export async function joinDisputeTx(
@@ -163,10 +183,8 @@ export async function requestJuryTx(
   const networkState = getOraoNetworkStatePDA();
   const random = getOraoRandomnessPDA(vrfSeed);
 
-  // Fetch treasury from network state
   const nsAccount = await program.provider.connection.getAccountInfo(networkState);
   if (!nsAccount) throw new Error("Orao VRF network state not found");
-  // Treasury pubkey is at offset 8 (discriminator) + 32 (authority) = 40
   const treasury = new PublicKey(nsAccount.data.subarray(40, 72));
 
   const sig = await (program.methods as any)
@@ -186,16 +204,30 @@ export async function requestJuryTx(
 
 export async function initializeJurorPoolTx(
   program: Program<JuryProgram>,
-  admin: PublicKey,
-  jurors: PublicKey[]
+  admin: PublicKey
 ): Promise<string> {
   const [jurorPoolPDA] = getJurorPoolPDA();
   const sig = await (program.methods as any)
-    .initializeJurorPool(jurors)
+    .initializeJurorPool()
     .accounts({
       admin,
       jurorPool: jurorPoolPDA,
       systemProgram: SystemProgram.programId,
+    })
+    .rpc();
+  return sig as string;
+}
+
+export async function registerJurorTx(
+  program: Program<JuryProgram>,
+  juror: PublicKey
+): Promise<string> {
+  const [jurorPoolPDA] = getJurorPoolPDA();
+  const sig = await (program.methods as any)
+    .registerJuror()
+    .accounts({
+      juror,
+      jurorPool: jurorPoolPDA,
     })
     .rpc();
   return sig as string;
@@ -249,4 +281,61 @@ export async function claimStakesTx(
     })
     .rpc();
   return sig as string;
+}
+
+export async function submitEvidenceTx(
+  program: Program<JuryProgram>,
+  party: PublicKey,
+  disputePDA: PublicKey,
+  uri: string,
+  currentEvidenceCount: number
+): Promise<string> {
+  const [evidencePDA] = PublicKey.findProgramAddressSync(
+    [EVIDENCE_SEED, disputePDA.toBytes(), new Uint8Array([currentEvidenceCount])],
+    PROGRAM_ID
+  );
+
+  const sig = await (program.methods as any)
+    .submitEvidence(uri)
+    .accounts({
+      party,
+      dispute: disputePDA,
+      evidenceEntry: evidencePDA,
+      systemProgram: SystemProgram.programId,
+    })
+    .rpc();
+  return sig as string;
+}
+
+export async function expireDisputeTx(
+  program: Program<JuryProgram>,
+  disputePDA: PublicKey,
+  plaintiffPubkey: PublicKey,
+  defendantPubkey: PublicKey
+): Promise<string> {
+  const sig = await (program.methods as any)
+    .expireDispute()
+    .accounts({
+      dispute: disputePDA,
+      plaintiff: plaintiffPubkey,
+      defendant: defendantPubkey,
+    })
+    .rpc();
+  return sig as string;
+}
+
+export async function fetchJurorPool(
+  program: Program<JuryProgram>
+): Promise<{ admin: PublicKey; count: number; jurors: PublicKey[] } | null> {
+  const [jurorPoolPDA] = getJurorPoolPDA();
+  try {
+    const pool = await (program.account as any).jurorPool.fetch(jurorPoolPDA);
+    return {
+      admin: pool.admin,
+      count: pool.count,
+      jurors: pool.jurors.slice(0, pool.count),
+    };
+  } catch {
+    return null;
+  }
 }

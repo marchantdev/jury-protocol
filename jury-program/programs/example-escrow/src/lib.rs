@@ -3,7 +3,7 @@ use jury_program::cpi::accounts::CreateDispute;
 use jury_program::cpi::create_dispute;
 use jury_program::program::JuryProgram;
 
-declare_id!("GRsgA2biJW7qLX5YyHXxX46g2GhcqtpR5UuChuH41s7J");
+declare_id!("BBbA94K4DvzGd99iMTK8QAYvK1tMoocgwLZ1Fk8fvN1w");
 
 /// Example: an escrow service that embeds JURY dispute resolution via CPI.
 ///
@@ -35,6 +35,7 @@ pub mod example_escrow {
             dispute_id,
             reason,
             stake_lamports,
+            0_i64, // use default deadline (7 days)
         )?;
 
         Ok(())

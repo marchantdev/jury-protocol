@@ -122,8 +122,7 @@
     {
       "name": "create_dispute",
       "docs": [
-        "Create a new dispute between two parties.",
-        "Both parties stake SOL; the loser forfeits their stake."
+        "Create a new dispute. deadline_seconds: 0 = 7 days default."
       ],
       "discriminator": [
         161,
@@ -191,14 +190,139 @@
         {
           "name": "stake_lamports",
           "type": "u64"
+        },
+        {
+          "name": "deadline_seconds",
+          "type": "i64"
         }
       ]
     },
     {
+      "name": "debug_set_jury",
+      "docs": [
+        "Test helper: admin sets jury directly, advancing dispute to Deliberating.",
+        "Bypasses VRF so cast_vote/claim_stakes can be tested on localnet."
+      ],
+      "discriminator": [
+        14,
+        122,
+        200,
+        54,
+        234,
+        224,
+        125,
+        231
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "jury",
+          "type": {
+            "array": [
+              "pubkey",
+              3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "expire_dispute",
+      "docs": [
+        "Expire a dispute that has passed its deadline.",
+        "Returns stakes to both parties. Anyone can call this."
+      ],
+      "discriminator": [
+        241,
+        116,
+        178,
+        182,
+        234,
+        173,
+        61,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "plaintiff",
+          "writable": true
+        },
+        {
+          "name": "defendant",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initialize_juror_pool",
       "docs": [
-        "Initialize the on-chain juror pool. Only the admin can set the pool.",
-        "This replaces the previous caller-supplied pool, fixing the trust model."
+        "Initialize the on-chain juror pool. Admin creates it; anyone can register after."
       ],
       "discriminator": [
         243,
@@ -244,17 +368,7 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "jurors",
-          "type": {
-            "array": [
-              "pubkey",
-              9
-            ]
-          }
-        }
-      ]
+      "args": []
     },
     {
       "name": "join_dispute",
@@ -310,6 +424,53 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "register_juror",
+      "docs": [
+        "Open registration: any wallet can register as a juror."
+      ],
+      "discriminator": [
+        116,
+        81,
+        98,
+        42,
+        220,
+        219,
+        2,
+        141
+      ],
+      "accounts": [
+        {
+          "name": "juror",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "juror_pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  106,
+                  117,
+                  114,
+                  111,
+                  114,
+                  95,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
         }
       ],
       "args": []
@@ -554,8 +715,7 @@
     {
       "name": "reveal_jury",
       "docs": [
-        "Reveal the jury after VRF fulfillment.",
-        "Reads juror pool from on-chain PDA — not caller-supplied."
+        "Reveal the jury after VRF fulfillment."
       ],
       "discriminator": [
         162,
@@ -703,6 +863,74 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "submit_evidence",
+      "docs": [
+        "Append an evidence URI to the dispute log. Only plaintiff or defendant may call.",
+        "Creates a separate EvidenceEntry PDA per submission (append-only)."
+      ],
+      "discriminator": [
+        12,
+        169,
+        228,
+        194,
+        229,
+        31,
+        44,
+        39
+      ],
+      "accounts": [
+        {
+          "name": "party",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "dispute",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  112,
+                  117,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "dispute.plaintiff",
+                "account": "Dispute"
+              },
+              {
+                "kind": "account",
+                "path": "dispute.id",
+                "account": "Dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "evidence_entry",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -717,6 +945,19 @@
         36,
         241,
         74
+      ]
+    },
+    {
+      "name": "EvidenceEntry",
+      "discriminator": [
+        18,
+        93,
+        232,
+        205,
+        163,
+        124,
+        132,
+        208
       ]
     },
     {
@@ -771,6 +1012,45 @@
         152,
         137,
         93
+      ]
+    },
+    {
+      "name": "DisputeExpired",
+      "discriminator": [
+        28,
+        47,
+        191,
+        124,
+        204,
+        113,
+        101,
+        116
+      ]
+    },
+    {
+      "name": "EvidenceSubmitted",
+      "discriminator": [
+        13,
+        123,
+        197,
+        44,
+        231,
+        117,
+        168,
+        53
+      ]
+    },
+    {
+      "name": "JurorRegistered",
+      "discriminator": [
+        230,
+        10,
+        225,
+        15,
+        204,
+        86,
+        23,
+        126
       ]
     },
     {
@@ -894,6 +1174,46 @@
       "code": 6010,
       "name": "RandomnessNotFulfilled",
       "msg": "VRF randomness not yet fulfilled"
+    },
+    {
+      "code": 6011,
+      "name": "NotAParty",
+      "msg": "Signer is not a party to this dispute"
+    },
+    {
+      "code": 6012,
+      "name": "DeadlineNotReached",
+      "msg": "Dispute deadline has not been reached"
+    },
+    {
+      "code": 6013,
+      "name": "Unauthorized",
+      "msg": "Unauthorized: only admin can perform this action"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidParty",
+      "msg": "Invalid party account"
+    },
+    {
+      "code": 6015,
+      "name": "JurorPoolFull",
+      "msg": "Juror pool is full"
+    },
+    {
+      "code": 6016,
+      "name": "AlreadyRegistered",
+      "msg": "Already registered as juror"
+    },
+    {
+      "code": 6017,
+      "name": "InsufficientJurors",
+      "msg": "Not enough jurors registered"
+    },
+    {
+      "code": 6018,
+      "name": "EvidenceUriTooLong",
+      "msg": "Evidence URI too long or empty"
     }
   ],
   "types": [
@@ -992,6 +1312,14 @@
             "type": "i64"
           },
           {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "evidence_count",
+            "type": "u8"
+          },
+          {
             "name": "bump",
             "type": "u8"
           }
@@ -1024,6 +1352,23 @@
       }
     },
     {
+      "name": "DisputeExpired",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "DisputeStatus",
       "type": {
         "kind": "enum",
@@ -1045,6 +1390,73 @@
           },
           {
             "name": "Claimed"
+          },
+          {
+            "name": "Expired"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EvidenceEntry",
+      "docs": [
+        "Append-only evidence entry. One PDA per evidence submission."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute",
+            "type": "pubkey"
+          },
+          {
+            "name": "party",
+            "type": "pubkey"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "submitted_at",
+            "type": "i64"
+          },
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EvidenceSubmitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "dispute_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "party",
+            "type": "pubkey"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "index",
+            "type": "u8"
           }
         ]
       }
@@ -1052,8 +1464,7 @@
     {
       "name": "JurorPool",
       "docs": [
-        "On-chain juror pool — stores registered juror addresses.",
-        "Initialized by admin, read by reveal_jury. Replaces caller-supplied pool."
+        "On-chain juror pool — open registration, up to 32 jurors."
       ],
       "type": {
         "kind": "struct",
@@ -1063,16 +1474,36 @@
             "type": "pubkey"
           },
           {
+            "name": "count",
+            "type": "u8"
+          },
+          {
             "name": "jurors",
             "type": {
               "array": [
                 "pubkey",
-                9
+                32
               ]
             }
           },
           {
             "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JurorRegistered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "juror",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_size",
             "type": "u8"
           }
         ]

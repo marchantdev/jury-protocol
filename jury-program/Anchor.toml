@@ -5,19 +5,19 @@ package_manager = "yarn"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-jury_program = "4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15"
-example_escrow = "GRsgA2biJW7qLX5YyHXxX46g2GhcqtpR5UuChuH41s7J"
-
 [programs.devnet]
-jury_program = "4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15"
 example_escrow = "GRsgA2biJW7qLX5YyHXxX46g2GhcqtpR5UuChuH41s7J"
+jury_program = "4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15"
+
+[programs.localnet]
+example_escrow = "BBbA94K4DvzGd99iMTK8QAYvK1tMoocgwLZ1Fk8fvN1w"
+jury_program = "AyLgnN3s5QdhVEQ6qzSXGarUW786tnrmgdsHS19oABxT"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
