@@ -76,7 +76,7 @@ State machine: `Open → AwaitingJury → JuryRequested → Deliberating → Dec
 
 Mean fulfillment: 4.5 slots (~2.5 seconds). Transaction signatures in [`spike-result.md`](spike-result.md).
 
-**Anchor Program:** 527 LOC, 7 instructions, 314KB BPF binary. **Tests:** 5/5 passing.
+**Anchor Program:** 527 LOC, 7 instructions, 314KB BPF binary. **Tests:** 6/6 passing (including JurorPool PDA initialization).
 
 ## Architecture
 
@@ -117,7 +117,7 @@ Protocol fee (3%) on resolved disputes. Revenue scales with partner transaction 
 ```bash
 cd jury-program
 anchor build
-anchor test  # 5/5 tests pass
+anchor test --validator legacy  # 6/6 tests pass
 anchor deploy --provider.cluster devnet
 ```
 
@@ -178,7 +178,7 @@ Pre-seeded pool of 9 juror addresses. VRF derives 3 unique juror indices via `ra
 ## Video
 
 - **Technical demo:** 2:35 walkthrough ([tech-demo-v2.mp4](tech-demo-v2.mp4))
-- **Pitch video:** 3-minute pitch (problem, solution, live demo, market)
+- **Pitch video:** 3:38 pitch ([pitch-video.mp4](pitch-video.mp4)) — problem, market, CPI innovation, working product, business model
 
 ## License
 
