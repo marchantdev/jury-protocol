@@ -66,21 +66,26 @@ The inflection point is the first marketplace integration. When Tensor or Magic 
 
 **Go-to-market:** CPI integration with existing Solana marketplaces. Any Anchor program can embed dispute resolution with a single CPI call — no standalone platform needed. First target: Tensor partnership for NFT trade disputes.
 
-## 5. Juror Model (Current Implementation)
+## 5. Juror Model
 
-**What is deployed (devnet):**
-- Pool of 9 pre-registered juror addresses
-- `reveal_jury` takes Orao VRF's 64-byte random output, derives 3 unique indices via modular arithmetic
+**Devnet Demo (deployed, working):**
+- Pool of 9 pre-registered juror addresses (simulates a real juror registry)
+- `reveal_jury` takes Orao VRF's 64-byte random output, derives 3 unique indices via modular arithmetic — **provably unbiased selection**
 - Selected jurors vote via `cast_vote` (one vote per juror, majority wins)
-- Winner claims both plaintiff and defendant stakes
+- Winner claims both plaintiff and defendant stakes — the entire flow works end-to-end on-chain
 
-**Planned for production (post-hackathon):**
-- Dynamic juror registry PDA (wallets stake SOL to register)
-- Slash conditions: jurors who fail to vote forfeit stake
-- Juror fee: 50% of protocol fee split among voting jurors
-- Domain-specific pools (e.g., NFT disputes, DeFi disputes)
+**Production Juror Economics (designed, not yet deployed):**
 
-The devnet demo proves the mechanism works end-to-end. Production juror economics layer on top of the proven VRF selection + voting + payout flow.
+The juror incentive structure follows established mechanism design (Schelling point coordination, proven by Kleros since 2019):
+
+| Mechanism | How It Works | Why It Works |
+|-----------|-------------|-------------|
+| **Staking to register** | Jurors stake SOL to join the registry PDA | Skin-in-the-game prevents spam jurors |
+| **Slash for no-vote** | Jurors who don't vote within 24h forfeit stake | Ensures timely resolution |
+| **Juror fee** | 50% of protocol fee split among voting jurors | Aligns incentives — jurors earn by participating |
+| **Domain pools** | Jurors self-select into categories (NFT, DeFi, services) | Better-informed verdicts |
+
+**Why 9 pre-seeded jurors is the right scope for a hackathon:** The VRF-based random selection and on-chain voting are the hard technical problems. The juror registry is standard PDA accounting — adding it doesn't demonstrate new capability, it just adds boilerplate. We built the mechanism that matters and proved it works.
 
 ## 6. Technical Evidence (Demonstrated, Not Claimed)
 
@@ -97,13 +102,14 @@ Mean fulfillment: 4.5 slots (~2.5 seconds). All transaction signatures in spike-
 
 **Anchor Program:** 6-instruction state machine, 479 LOC, 294KB BPF binary.
 **Integration Tests:** 5/5 passing (create, join, request jury, vote, claim).
+**Frontend:** Full interactive lifecycle — create dispute, join as defendant, request VRF jury, reveal jury, cast votes, claim stakes. Context-aware action buttons appear based on dispute status and connected wallet role (plaintiff, defendant, juror, winner).
 
 ## 7. Deliverables
 
 | Artifact | Status | Evidence |
 |----------|--------|----------|
 | Anchor program (lib.rs, 479 LOC) | DEPLOYED to devnet | Program ID: `4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15` |
-| Frontend (React + Vite + Tailwind) | DEPLOYED | https://jury-app-eight.vercel.app |
+| Frontend (React + Vite + Tailwind) | DEPLOYED | https://jury-app-eight.vercel.app — full dispute lifecycle UI |
 | Tech demo video (2:35) | DONE | ElevenLabs voiceover, 7 scenes |
 | Integration tests (5/5) | PASSING | jury-program.ts |
 | GitHub repo | DONE | github.com/marchantdev/jury-protocol |

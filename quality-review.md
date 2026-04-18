@@ -15,12 +15,12 @@
 | Category | Score | Notes |
 |----------|-------|-------|
 | Code Quality (Anchor) | 8/10 | Clean, idiomatic, well-structured |
-| Frontend Quality | 6/10 | Works, but thin — no VRF-flow UI past create |
+| Frontend Quality | 8/10 | Full lifecycle UI: create, join, request VRF jury, reveal, vote, claim |
 | Documentation | 7/10 | README strong; ARCHITECTURE.md stale |
 | Deployment | 8/10 | Program live on devnet; Vercel frontend confirmed |
-| Demo Readiness | 6/10 | Create-dispute flow works end-to-end; VRF/voting requires CLI |
+| Demo Readiness | 8/10 | Full dispute lifecycle clickable from browser — context-aware action buttons |
 | Known Issues | — | See section 6 |
-| **Overall** | **7/10** | Solid technical core. Demo gap: VRF jury flow is not clickable from the browser. |
+| **Overall** | **8/10** | Complete interactive dispute flow. All 6 on-chain instructions accessible from the frontend. |
 
 ---
 
@@ -83,11 +83,11 @@ With 3 jurors, a 2-1 split always decides. But if somehow votes are equal (which
 
 ## 2. Frontend Quality
 
-**Score: 6/10**
+**Score: 8/10**
 
 ### Evidence
 - Files: `jury-app/src/` (7 source files, ~700 lines total TypeScript/TSX)
-- Stack: React 18, Vite, Tailwind, `@solana/wallet-adapter-react`, `@coral-xyz/anchor`
+- Stack: React 19, Vite 6, Tailwind CSS 3, `@solana/wallet-adapter-react`, `@coral-xyz/anchor`
 - Routes: `/` (Landing), `/app` (DisputeApp), `/dispute/:id` (DisputeView)
 
 ### Strengths
@@ -111,9 +111,6 @@ Plaintiff/defendant/juror addresses link to `explorer.solana.com/address/...?clu
 `jury-*` Tailwind tokens (green `#00ffa3`, near-black `#050505`, surface `#111111`) are used throughout. No placeholder or default colors. Space Grotesk + JetBrains Mono font pair is appropriate.
 
 ### Weaknesses
-
-**VRF jury flow is not accessible from the browser.**
-The frontend only exposes `createDisputeTx` in `useProgram.ts`. There is no UI for `joinDispute`, `requestJury`, `revealJury`, `castVote`, or `claimStakes`. A user who creates a dispute via the app hits a dead end — the dispute view shows its state and jury panel, but there are no action buttons to advance the flow. The full lifecycle requires CLI or direct RPC calls.
 
 **`useProgram.ts` uses `type JuryProgram = any`.**
 The Anchor IDL type is bypassed (`IDL as any`, `program.methods as any`, `program.account as any`). This eliminates TypeScript's safety guarantees for all on-chain interactions. Runtime type errors will surface as cryptic RPC failures rather than compile-time warnings.
@@ -213,7 +210,7 @@ README states "294KB BPF binary" but the `.so` file is not committed (correct �
 
 ## 5. Demo Readiness
 
-**Score: 6/10**
+**Score: 8/10**
 
 ### What Works End-to-End (Browser + Phantom)
 
@@ -228,19 +225,18 @@ README states "294KB BPF binary" but the `.so` file is not committed (correct �
 9. Clicking a dispute navigates to `/dispute/:pda` and shows status, parties, jury panel, and verdict section.
 10. All Explorer links open correctly to devnet cluster.
 
-### What Does Not Work from the Browser
+### Full Lifecycle Available from Browser (Updated Apr 18)
 
-1. **Join dispute** — no UI. Defendant cannot join a dispute from the app.
-2. **Request jury (VRF)** — no UI. The payer must call `request_jury` via CLI with Orao's treasury account wired in.
-3. **Reveal jury** — no UI. Requires CLI with the juror pool addresses and the VRF randomness PDA.
-4. **Cast vote** — no UI. Jurors cannot vote from the browser.
-5. **Claim stakes** — no UI. Winner cannot claim from the browser.
+All 6 on-chain instructions are now accessible from the frontend UI via context-aware action buttons in DisputeView.tsx:
 
-### Demo Workaround
+1. **Create dispute** — form in DisputeApp with description + SOL stake input
+2. **Join dispute** — "Join as Defendant" button appears for non-plaintiff wallets on Open disputes
+3. **Request jury (VRF)** — "Request VRF Jury" button on AwaitingJury disputes (triggers Orao CPI)
+4. **Reveal jury** — "Reveal Jury" button on JuryRequested disputes (reads VRF output)
+5. **Cast vote** — "Vote Plaintiff" / "Vote Defendant" buttons for selected jurors on Deliberating disputes
+6. **Claim stakes** — "Claim Stakes" button for the winner on Decided disputes
 
-The demo flow in `DEMO_FLOW.md` works around this by showing a pre-seeded dispute in a `Deliberating` or `Decided` state and demonstrating the read path (dispute list, dispute view, Explorer links, VRF evidence table). The create-dispute flow is the only live on-chain write demonstrated.
-
-This means roughly 5 of 6 instructions are demo-only through static state or Explorer links, not through live browser interaction.
+Action buttons show/hide based on dispute status and connected wallet role (plaintiff, defendant, juror, winner). Loading states, error messages, and auto-refresh after successful transactions are all handled.
 
 ### Demo Blocking Issues
 
@@ -253,14 +249,14 @@ This means roughly 5 of 6 instructions are demo-only through static state or Exp
 
 ### Critical (would affect judging or usability)
 
-**C1 — VRF flow not browser-accessible.**
-The full dispute lifecycle requires CLI access. The hackathon submission demonstrates create + read but not the core VRF jury selection that differentiates the project. Mitigation: pre-seed a dispute in Deliberating state before the demo and use the read-path to show jury selection results.
+**C1 — VRF flow now browser-accessible (RESOLVED Apr 18).**
+All 6 instructions (create, join, request jury, reveal jury, vote, claim) are accessible via context-aware buttons in DisputeView.tsx. The full dispute lifecycle can be completed entirely from the browser.
 
 **C2 — ARCHITECTURE.md describes a different program.**
 Instruction names and state machine in ARCHITECTURE.md do not match lib.rs. If judges use ARCHITECTURE.md as a reference, they will find inconsistencies. Mitigation: delete or rewrite ARCHITECTURE.md to match the actual program.
 
-**C3 — GitHub link on landing page is a placeholder.**
-`href="https://github.com"` in Landing.tsx line 37. Fix: replace with `https://github.com/marchantdev/jury-protocol`.
+**C3 — GitHub link on landing page (RESOLVED).**
+Now correctly links to `https://github.com/marchantdev/jury-protocol`.
 
 ### Moderate (quality/completeness issues)
 
@@ -315,10 +311,10 @@ If the judge's machine does not have these fonts installed, the UI falls back to
 - [x] Error states and loading states handled
 - [x] Explorer links correct and open to devnet
 - [x] Status rendering correct for all 6 states
-- [ ] Full dispute lifecycle accessible from browser (join, requestJury, revealJury, castVote, claimStakes)
+- [x] Full dispute lifecycle accessible from browser (join, requestJury, revealJury, castVote, claimStakes)
 - [ ] TypeScript types used (not `any`)
 - [ ] Real-time polling or subscription
-- [ ] "View Source" link points to actual repo
+- [x] "View Source" link points to actual repo
 
 ### Documentation
 - [x] README covers problem, solution, architecture, instructions, VRF evidence, tech stack, project structure, local run, on-chain IDs, competitive landscape
@@ -333,7 +329,7 @@ If the judge's machine does not have these fonts installed, the UI falls back to
 - [x] Frontend live on Vercel
 - [x] Program ID consistent across all files
 - [x] IDL embedded in frontend
-- [ ] GitHub link on landing page corrected
+- [x] GitHub link on landing page corrected
 - [ ] Mainnet deployment (not applicable for hackathon, but note the gap)
 
 ---
