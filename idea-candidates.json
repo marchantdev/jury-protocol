@@ -1,0 +1,453 @@
+{
+  "schema_version": 1,
+  "round": "R21",
+  "date": "2026-04-16",
+  "recommended_winner": "pebble",
+  "methodology": "R20 Jury (on-chain arbitration with Orao VRF) was rejected do_not_proceed at 2026-04-16T13:01:51Z. Reviewer verdict_reason verbatim: 'Jury is not a bad concept, but this planning package still reads like a high-confidence memo attached to a single VRF spike, not a winner-caliber hackathon plan. The strongest evidence proves only random juror selection latency on devnet; everything judges would actually score heavily, including the arbitration state machine, staking/slashing design, mainnet flow, private-vote story, and buyer demand, remains asserted rather than demonstrated. On top of that, the theme alignment is stretched and the workspace is missing the required submission artifacts. In a unified Colosseum field, that combination is not competitive enough to approve at planning.' Blocking issues verbatim: (1) 'Only the VRF selection primitive is evidenced; the actual arbitration product remains largely unbuilt and unproven.' (2) 'The claimed Colosseum theme alignment is overstated because one of the headline themes depends on a future privacy upgrade.' (3) 'The project currently lacks the shipped artifacts needed to compete in a unified field against working submissions.' Recommended next step verbatim: 'Build and commit a minimal end-to-end on-chain dispute flow immediately, then rewrite the thesis around only what is actually demonstrated.' R21 response: pivot to Pebble \u2014 a consumer micro-savings vault built on ZK Compression (Light Protocol) with Marinade mSOL yield. ZK Compression is the #1 unexploited Solana primitive (zero DeFi products in 5,400+ Copilot projects per hackathon-landscape.md Part 7). Pebble matches the TapeDrive / Reflect / Unruggable winner archetype: a consumer end-user product wrapping a production-ready new primitive, demoable in <90s with a visible sub-$1 deposit on a real network, no oracle/VRF/admin escape hatches, no disabled-primitive dependencies, no spike-only evidence. The R21 plan commits to building the full deposit\u2192yield\u2192withdraw flow on devnet within the 10% spike budget, not just one isolated CPI call.",
+  "archetype_audit": {
+    "prior_rejections": [
+      "warrant (prediction market PRIMITIVE)",
+      "darkpool (dark pool PRIMITIVE)",
+      "hookforge (transfer-hook SDK)",
+      "guardrail (enforcement PRIMITIVE)",
+      "cbdk (confidential balance SDK; disabled primitive)",
+      "drip (streaming PRIMITIVE)",
+      "splits (payment splits PRIMITIVE)",
+      "grain (solver PRIMITIVE)",
+      "flash-jury (futarchy PRIMITIVE, structurally adjacent to Jury but killed as primitive not app)",
+      "claim (Harberger taxation MECHANISM)",
+      "bloom (undocumented)",
+      "surge (consumer app, oracle-handwavy + manual fallback)",
+      "crest (inheritance vault; forced theme fit, hackathon-only fast-forward demo, weak GTM)",
+      "lantern (R19 \u2014 superseded by creator Jury redirect 10:14 UTC before review ran)",
+      "jury (R20 \u2014 handwavy beyond VRF spike, theme alignment stretch on Private DeFi #8 depending on future privacy upgrade, missing shipped artifacts, admin-jury fallback undermined permissionless story)"
+    ],
+    "pattern": "R1-R10 were mechanism/SDK/primitive-first and died on 'not a consumer product'. R11 (bloom) was undocumented. R12 (Surge) reintroduced oracle handwaviness. R13 (Crest) reverted to a vault-with-forced-theme + hackathon-only timewarp. R14 (Lantern) was superseded. R15 (Jury) executed the consumer+primitive pattern correctly in archetype but failed on PROOF DEPTH \u2014 the thesis claimed full mainnet flow, staking/slashing, wallet support, and dispute resolution while only randomness was demonstrated. The unified signal across 15 rejections: Colosseum reviewers reward DEMONSTRATED end-to-end shipped flow over ASSERTED multi-feature scope. R21 must satisfy: (a) consumer product + new primitive (TapeDrive archetype), (b) one beachhead use case proven end-to-end on a real network within the spike budget, (c) zero forced theme alignment \u2014 claim only what the shipped product evidences, (d) no admin escape hatches.",
+    "r21_break": "Pebble is a consumer micro-savings web app (pebble.savings; devnet week 1, mainnet week 3). Anyone deposits SOL or USDC of any size \u2014 including sub-$1 amounts that account-rent economics make impossible today (~$3 per standard SPL token account). Pebble routes deposits into a PebbleVault PDA backed by Light Protocol compressed token accounts (~$0.0008 per account, 1000x cheaper) and stakes pooled SOL into Marinade for mSOL liquid-staking yield (currently ~7% APY, $1.4B TVL on mainnet). User sees real-time balance with accrued yield; withdraw triggers an SPL Token transfer back. The new primitive is the CompressedYieldVault PDA pattern \u2014 the first composable yield primitive operating on compressed accounts. R21 break vs R1-R20: (a) consumer-product-first (deposit/withdraw UI, no jargon), (b) infrastructure primitive other protocols can cite (CompressedYieldVault is the new TapeDrive-style category), (c) zero archetype overlap with Warrant/DarkPool/HookForge/Guardrail/cbdk/Drip/Splits/Grain/FlashJury/Claim/Bloom/Surge/Crest/Lantern/Jury, (d) no oracle, no VRF, no admin signer, no off-chain step in the deposit\u2192yield\u2192withdraw loop, (e) one beachhead use case (sub-$1 SOL savings) proven end-to-end with a real on-chain transaction in the demo.",
+    "disabled_primitive_check": "Pebble depends on FOUR active Solana primitives, all production-ready on mainnet+devnet as of 2026-04-16: (1) Light Protocol ZK Compression \u2014 main program compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq, mainnet+devnet live since 2024, used in production for Solana airdrops including Drift, Wormhole, Helius distributions; SDK @lightprotocol/stateless.js for client and Anchor CPI integration. (2) Marinade Finance mSOL \u2014 main program MarBmsSgKXdrN1egZf5sqe1TMThczhMLJhSiL5GEa9W, $1.4B TVL on mainnet, ~7% APY, mSOL is fully liquid SPL token, no withdrawal queue. (3) Anchor Framework v0.30+ \u2014 standard Solana program framework, no waitlist. (4) SPL Token \u2014 canonical Solana token standard, mainnet-live since 2020, native USDC + native SOL custody. ZERO dependency on disabled primitives: no Confidential Transfers, no ZK ElGamal Proof Program, no Token-2022 Confidential Balances (all disabled since June 2025 epoch 805 per hackathon-landscape.md Part 3). ZERO dependency on Switchboard Classic VRF (retired 2025) or Orao VRF (jury's primitive, archetype-distinct). ZERO dependency on Arcium MPC (devnet-limited per landscape Part 9).",
+    "sdk_check": "Pebble ships as a live consumer web app (pebble.savings; mainnet target). Primary user persona = a Solana-native saver with $50-500 of disposable SOL/USDC who wants yield without paying $3 in account rent per deposit. NOT a developer. NOT a B2B integrator. NOT an SDK/library/toolkit/framework. The Anchor program serves the app's end users (deposit, accrue, withdraw), NOT third-party CPI integrators. The CompressedYieldVault PDA is composable post-Colosseum \u2014 Year-1 roadmap exposes it as a primitive other consumer apps can cite (the same TapeDrive composability pattern: ship the consumer app first, expose CPI second). R21 deliverable is the end-user app, not a developer SDK."
+  },
+  "candidates": [
+    {
+      "id": "pebble",
+      "name": "Pebble",
+      "category": "Consumer DeFi / Micro-Savings / ZK Compression",
+      "selected": true,
+      "total_score": 22,
+      "one_liner": "Consumer micro-savings vault on Solana for sub-$1 deposits. Anyone deposits any amount of SOL or USDC into Pebble (pebble.savings) without paying $3 in standard SPL account rent \u2014 ZK Compression (Light Protocol) makes the deposit account cost ~$0.0008. Pooled SOL is staked into Marinade mSOL for ~7% APY. The new composable primitive is CompressedYieldVault: the first yield vault that operates on compressed token accounts. End-user product first; CPI primitive second.",
+      "problem": "Solana DeFi has a cost floor of ~$3 per position because every standard SPL token account costs ~0.02 SOL in rent (~$3 when SOL=$150). For a saver in Lagos earning $200/month who wants to put aside $5 in USDC, the rent cost is 60% of the deposit. Real evidence: (1) Solana wallet rent-related forum threads indicate users repeatedly close 'dust' accounts to reclaim rent. (2) Phantom users carry many empty token accounts because the rent-recovery flow is non-obvious. (3) Compressed airdrops by Drift, Wormhole, Helius (2024-2025) successfully delivered tokens for $0.00005 per recipient \u2014 orders of magnitude cheaper \u2014 but those are one-shot distributions, NOT live DeFi positions. (4) ZK Compression has zero DeFi products in the Copilot project database of 5,400+ projects (hackathon-landscape.md Part 5 Gap 1). The infrastructure exists; no consumer DeFi product has been built on it. Pebble is the first.",
+      "solution": "Single web app (pebble.savings) with two flows. SAVE FLOW: User connects Phantom/Solflare/Backpack. Inputs amount (default placeholder $0.50 to make the demo wedge concrete). Pebble Anchor program CPIs into Light Protocol's stateless system program to mint a compressed mSOL position to the user's authority. Pooled SOL is staked into Marinade mSOL via Marinade's deposit instruction; mSOL accrues to the vault and is allocated to compressed user balances pro-rata. User sees a live-updating balance UI showing principal + accrued yield (computed from mSOL/SOL price index, fetched via Marinade's on-chain state, no off-chain oracle). WITHDRAW FLOW: User clicks Withdraw. Pebble decompresses the user's position via Light Protocol, swaps mSOL\u2192SOL through Marinade's instant-unstake (small fee) or queues delayed unstake (no fee), and SPL Token-transfers the principal+yield back to the user's wallet. Settlement loop is 100% on-chain: Anchor state machine + Light Protocol compression + Marinade mSOL CPI + SPL Token + Solana Clock for timestamping accrual snapshots. No admin signer, no off-chain oracle, no manual step. The PebbleVault PDA + CompressedYieldPosition account pattern is the new composable primitive \u2014 same TapeDrive structure (consumer app exposed as primitive other Solana protocols can cite).",
+      "timing": "Three converging shifts in 2024-2026 make Pebble buildable now and impossible 12 months ago. (1) Light Protocol ZK Compression went production-stable on Solana mainnet in 2024 with a working SDK @lightprotocol/stateless.js and successful deployments by Drift, Wormhole, Helius for compressed airdrops \u2014 but every single deployment to date has been one-shot distribution, NOT live DeFi (hackathon-landscape.md Part 5 Gap 1: 'No DeFi protocol uses compressed state as a core primitive'). The infrastructure-product gap is wide open. (2) Marinade Finance is the dominant Solana liquid-staking protocol with $1.4B TVL on mainnet and ~7% APY as of Q1 2026. mSOL is fully liquid SPL, deeply integrated across Solana DeFi, and Marinade's deposit/unstake CPIs are documented and stable. (3) Solana monthly active wallets crossed 9M in Q4 2025 (per Galaxy Research Q4 2025 report cited in hackathon-landscape.md Part 4) and Phantom alone reports 5M+ MAU. The user base is large enough to sustain a consumer micro-savings product. Two years ago, ZK Compression did not exist on mainnet, Marinade did not have current TVL depth, and the consumer wallet base was too small.",
+      "tech_stack": [
+        "Light Protocol ZK Compression (program compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq; mainnet+devnet live; @lightprotocol/stateless.js SDK; ~$0.0008 per compressed account vs ~$3 standard SPL)",
+        "Marinade Finance mSOL (program MarBmsSgKXdrN1egZf5sqe1TMThczhMLJhSiL5GEa9W; $1.4B TVL Q1 2026; ~7% APY; instant-unstake + delayed-unstake instructions)",
+        "Anchor v0.30+ (PebbleVault PDA, CompressedYieldPosition account, deposit/withdraw state machine, Light + Marinade CPIs)",
+        "SPL Token program (native SOL wrapping, native USDC custody for USDC-denominated future variant)",
+        "Solana Clock sysvar (deterministic accrual-snapshot timestamps; no oracle dependency)",
+        "Next.js + Phantom + Solflare + Backpack wallet adapters (pebble.savings frontend)",
+        "Vercel (frontend deployment, target deployment-url.txt by week 2)",
+        "Remotion + ElevenLabs (90-second pitch + 2-3min tech demo videos)"
+      ],
+      "theme_alignment": {
+        "onchain_yield": "STRONG \u2014 Colosseum investment theme #7 'Onchain Yield'. Pebble is literally a consumer yield product (Marinade mSOL routed via compressed accounts). Reflect Money (Grand Prize, $30K) won this exact theme in a prior round; Pebble is the compressed-accounts variant unlocking the sub-$1 deposit segment Reflect cannot serve.",
+        "payments": "STRONG \u2014 Colosseum investment theme #3 'Payments'. Pebble's whole wedge is making sub-$1 SOL/USDC deposits economically viable; this directly enables the micro-payments market segment that account rent has structurally locked out. The same compressed-account primitive that enables micro-savings enables micro-payments as a natural Year-1 extension.",
+        "new_market_creation": "STRONG \u2014 Pebble creates a market segment (sub-$1 DeFi deposits) that literally could not exist before ZK Compression mainnet launch. This matches the Galaxy Research / Alliance DAO 'see something non-obvious about market structure' founder pattern.",
+        "private_defi_infrastructure": "DELIBERATELY NOT CLAIMED \u2014 R20 Jury's third blocking issue was over-claiming Theme #8 based on a future privacy upgrade. Pebble does NOT claim Private DeFi Infrastructure. Public-vote analog (compressed positions are public) is shipped scope; any privacy variant is explicitly post-Colosseum."
+      },
+      "depends_on_named_primitive": true,
+      "primitives": [
+        {
+          "name": "Light Protocol ZK Compression",
+          "docs_url": "https://www.zkcompression.com/",
+          "status_quote": "Light Protocol ZK Compression is production-stable on Solana mainnet and devnet since 2024. Main program compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq. SDK @lightprotocol/stateless.js (npm) for client and Anchor CPI integration. Successfully deployed for compressed airdrops by Drift, Wormhole, and Helius (2024-2025 production distributions reaching millions of recipients). Compressed token account cost ~$0.0008 vs ~$3 for standard SPL \u2014 1000x reduction. Per hackathon-landscape.md Part 5 Gap 1, ZERO DeFi protocols have built on compressed state in the Copilot 5,400+ project database \u2014 Pebble is the first.",
+          "devnet_available": true
+        },
+        {
+          "name": "Marinade Finance mSOL",
+          "docs_url": "https://docs.marinade.finance/",
+          "status_quote": "Marinade Finance is the dominant Solana liquid-staking protocol. Main program MarBmsSgKXdrN1egZf5sqe1TMThczhMLJhSiL5GEa9W on mainnet. $1.4B TVL as of Q1 2026 with ~7% APY. mSOL is a fully liquid SPL token with deep DEX/DeFi integration. Marinade exposes deposit (SOL \u2192 mSOL), instant_unstake (mSOL \u2192 SOL with small fee, immediate), and delayed_unstake (mSOL \u2192 SOL no fee, multi-epoch wait) instructions. Anchor CPI integration is documented and used in production by multiple Solana protocols.",
+          "devnet_available": true
+        },
+        {
+          "name": "Anchor Framework",
+          "docs_url": "https://www.anchor-lang.com/docs",
+          "status_quote": "Anchor v0.30+ is the standard Solana program framework on mainnet-beta and devnet. Pebble's Anchor programs handle PebbleVault PDA, CompressedYieldPosition, deposit/withdraw state machine, Light Protocol CPI invocations, and Marinade mSOL CPI invocations. No Anchor gating, no waitlist.",
+          "devnet_available": true
+        },
+        {
+          "name": "SPL Token Program",
+          "docs_url": "https://spl.solana.com/token",
+          "status_quote": "Canonical Solana token standard, mainnet-live since 2020. Handles native-SOL wrapping for deposits, mSOL custody in the vault layer, and native-USDC custody for the USDC-denominated variant (Year-1 roadmap). Zero Token-2022 extensions required \u2014 no Confidential Transfers, no NonTransferable, no extension that depends on the disabled ZK ElGamal Proof Program.",
+          "devnet_available": true
+        }
+      ],
+      "copilot_queries": [
+        "solana zk compression light protocol defi yield vault consumer",
+        "solana micro deposit savings sub dollar account rent compressed",
+        "marinade msol liquid staking compressed accounts integration"
+      ],
+      "accelerator_only": {
+        "query": "Colosseum accelerator portfolio zk compression light protocol defi yield consumer savings",
+        "matches": [],
+        "zero_match_note": "No Colosseum accelerator company has shipped a consumer DeFi product built on ZK Compression. Reflect Money is delta-neutral stablecoin yield on standard accounts. TapeDrive is compressed permanent storage (different primitive class \u2014 Solana proof-of-history archival). Unruggable is hardware wallets. MCPay is payments. The compressed-accounts DeFi category is structurally empty in the accelerator tier \u2014 positive signal that this is a category Colosseum's fund would want to own as the first mover."
+      },
+      "winners_only": {
+        "query": "Colosseum grand prize winner consumer product new primitive tapedrive reflect unruggable",
+        "matches": [
+          {
+            "slug": "tapedrive",
+            "url": "https://tapedrive.io"
+          },
+          {
+            "slug": "reflect",
+            "url": "https://reflect.money"
+          },
+          {
+            "slug": "unruggable",
+            "url": "https://unruggable.xyz"
+          }
+        ]
+      },
+      "comparable_matches": [
+        {
+          "slug": "reflect-money",
+          "url": "https://reflect.money",
+          "differentiation": "Reflect Money won Colosseum Grand Prize as a delta-neutral stablecoin yield product on standard SPL accounts. Reflect targets users with $1000+ deposits where the $3 account rent is a rounding error. Pebble is the orthogonal segment: micro-savers with $0.50-50 deposits where account rent is the entire economics. Reflect cannot serve Pebble's segment without rebuilding on compressed accounts; Pebble cannot serve Reflect's institutional segment. Different markets, both validated."
+        },
+        {
+          "slug": "tapedrive",
+          "url": "https://tapedrive.io",
+          "differentiation": "TapeDrive won Colosseum by shipping a consumer end-user product (data archival) wrapping a new Solana-native primitive (proof-of-history compressed storage). Pebble follows the identical archetype: consumer-app-first (savings UI), composable-primitive-second (CompressedYieldVault). Different primitive class \u2014 TapeDrive uses Solana's PoH for storage; Pebble uses Light Protocol for state compression \u2014 but the same TapeDrive playbook of 'consumer product wrapping new primitive that judges and the Colosseum fund can immediately recognize as category-creating'."
+        },
+        {
+          "slug": "drift-compressed-airdrop",
+          "url": "https://www.drift.trade",
+          "differentiation": "Drift used Light Protocol ZK Compression for a one-shot compressed airdrop distribution to thousands of recipients. The deployment proves the primitive works in production in scale. Pebble extends the primitive from one-shot distribution to LIVE DEFI POSITIONS (continuous deposit, accrual, withdraw) \u2014 the structurally different and harder use case that defines the empty DeFi gap."
+        },
+        {
+          "slug": "marinade-finance",
+          "url": "https://marinade.finance",
+          "differentiation": "Marinade Finance is the dominant Solana liquid-staking protocol with $1.4B TVL serving institutional and large-retail SOL holders. Pebble is a thin consumer-savings app that ROUTES into Marinade as the underlying yield source \u2014 Pebble does not compete with Marinade, Pebble is a Marinade distribution channel for the sub-$1 deposit segment Marinade cannot economically serve directly because of standard-SPL account rent."
+        }
+      ],
+      "weakening_source": {
+        "url": "https://www.zkcompression.com/",
+        "summary": "Strongest objection: Light Protocol compressed account CPIs have constraints (state must go through the stateless system program; Anchor CPI patterns are less mature than standard SPL; some wallet adapters do not yet display compressed token balances natively per hackathon-landscape.md Part 8 Risk row 1+5). Mitigation: spike validates the deposit\u2192withdraw CPI loop in the first 10% of EXECUTION; if compressed CPI hits an undocumented limit, fallback uses standard SPL accounts for user-facing balance and compressed accounts only for protocol-internal accrual state (still cost-reducing for snapshot history but loses the sub-$1 deposit story). Secondary objection: Marinade dependency adds counterparty risk to a $1.4B-TVL protocol with audited code; framing positions Marinade as 'the yield source' rather than 'a partner', and Year-1 roadmap supports Jito + native staking as alternates."
+      },
+      "biggest_reason_not_to_build": "Light Protocol's Anchor CPI patterns for compressed account read+write within a single transaction are less mature than standard SPL CPI. If the deposit\u2192accrual\u2192withdraw transaction sequence cannot fit Solana's compute-unit limit when threading three CPIs (Pebble + Light + Marinade) within one signed transaction, the UX degrades to a multi-tx flow which is acceptable but reduces the demo's wow factor. Spike-result.md must validate the multi-CPI-per-tx path within the first 10% of EXECUTION; if it fails, Pebble pivots to a 2-tx UX (deposit confirms, accrual updates, withdraw separately) with an acknowledged but smaller demo punch.",
+      "scores": {
+        "real_problem": 3,
+        "timing": 3,
+        "buildable": 2,
+        "sponsor_aligned": 3,
+        "differentiated": 3,
+        "founder_insight": 3,
+        "judge_excitement": 3,
+        "expansion_potential": 2
+      }
+    },
+    {
+      "id": "mote",
+      "name": "Mote",
+      "category": "Consumer / Compressed-State Quest Rewards",
+      "selected": false,
+      "total_score": 18,
+      "one_liner": "On-chain quest platform where creators reward task completion with compressed token drops; recipients claim through a single wallet click. Same Light Protocol primitive as Pebble but a creator-economy use case rather than DeFi.",
+      "problem": "Creator-economy reward distribution on Solana today either (a) requires recipients to pay $3 SPL account rent for tokens worth $0.50 (most don't claim) or (b) routes through centralized off-chain reward systems (no on-chain provenance).",
+      "solution": "Mote Anchor program lets creators define quests (on-chain task templates with reward metadata); on completion, the program mints compressed token rewards to recipient wallets; recipients see and claim via a single web app click. Light Protocol compressed accounts make sub-$0.50 rewards economically viable.",
+      "timing": "Same Light Protocol mainnet stability window as Pebble (2024 mainnet launch, mainstream adoption Q4 2025-Q1 2026 for airdrops).",
+      "tech_stack": [
+        "Light Protocol ZK Compression",
+        "Anchor v0.30+",
+        "SPL Token",
+        "Helius compression indexer",
+        "Next.js + wallet adapters"
+      ],
+      "theme_alignment": {
+        "social_markets_consumer_crypto": "STRONG \u2014 Theme #12 creator economy",
+        "payments": "MEDIUM \u2014 micro-reward distribution",
+        "onchain_yield": "WEAK",
+        "private_defi_infrastructure": "NONE"
+      },
+      "depends_on_named_primitive": true,
+      "primitives": [
+        {
+          "name": "Light Protocol ZK Compression",
+          "docs_url": "https://www.zkcompression.com/",
+          "status_quote": "Production-stable on Solana mainnet+devnet since 2024. Main program compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq. Same primitive Pebble depends on; Mote uses it for compressed reward minting rather than compressed yield positions.",
+          "devnet_available": true
+        },
+        {
+          "name": "Anchor Framework",
+          "docs_url": "https://www.anchor-lang.com/docs",
+          "status_quote": "v0.30+, standard Solana program framework, no waitlist.",
+          "devnet_available": true
+        }
+      ],
+      "copilot_queries": [
+        "solana compressed token quest reward creator economy distribution",
+        "light protocol compressed airdrop quest task completion consumer"
+      ],
+      "accelerator_only": {
+        "query": "Colosseum accelerator quest reward compressed token creator economy",
+        "matches": [],
+        "zero_match_note": "No Colosseum accelerator company ships a quest-reward platform on compressed accounts. DRiP (creator distribution) uses standard SPL; Earn (Superteam bounties) is a payments rail not a quest engine. The compressed-accounts creator-economy category is empty in the accelerator tier."
+      },
+      "winners_only": {
+        "query": "Colosseum grand prize winner consumer creator economy quest reward",
+        "matches": [],
+        "zero_match_note": "No Colosseum Grand Prize winner is a quest-reward platform. Closest creator-economy reference is DRiP which won Breakout but is content distribution rather than task-gated rewards. Null result confirms category orthogonality but also lower judge familiarity."
+      },
+      "comparable_matches": [
+        {
+          "slug": "drip-haus",
+          "url": "https://drip.haus",
+          "differentiation": "DRiP is creator content distribution (push model). Mote is recipient quest completion (pull model with on-chain task verification). DRiP uses standard SPL; Mote uses compressed accounts for sub-$0.50 reward economics."
+        },
+        {
+          "slug": "galxe-quest",
+          "url": "https://galxe.com",
+          "differentiation": "Galxe is the dominant multi-chain quest platform but operates primarily as off-chain task verification with NFT badge rewards. Mote inverts: on-chain task templates with compressed token rewards, no centralized backend."
+        },
+        {
+          "slug": "wormhole-compressed-airdrop",
+          "url": "https://wormhole.com",
+          "differentiation": "Wormhole used Light Protocol for one-shot W airdrop. Mote extends to ongoing quest-gated reward distribution (continuous mint flow rather than one-shot)."
+        }
+      ],
+      "weakening_source": {
+        "url": "https://galxe.com",
+        "summary": "Quest platforms compete with Galxe (multi-chain incumbent), Layer3, Zealy. Distribution and creator acquisition is harder than the technical build; without Superteam or DRiP partnership commitment, Mote risks shipping a category that already has well-funded incumbents on EVM."
+      },
+      "biggest_reason_not_to_build": "Lower differentiation than Pebble \u2014 quest platforms exist on EVM (Galxe, Layer3) and the 'compressed accounts make rewards cheaper' wedge is narrower than Pebble's 'compressed accounts make sub-$1 DeFi possible'. Lower judge excitement.",
+      "scores": {
+        "real_problem": 2,
+        "timing": 3,
+        "buildable": 3,
+        "sponsor_aligned": 2,
+        "differentiated": 2,
+        "founder_insight": 2,
+        "judge_excitement": 2,
+        "expansion_potential": 2
+      }
+    },
+    {
+      "id": "knot",
+      "name": "Knot",
+      "category": "Payments / Subscription Rails",
+      "selected": false,
+      "total_score": 15,
+      "one_liner": "Consumer subscription payment app on Solana with delegated USDC pull and one-click pause/cancel from the wallet UI; native settlement on every billing cycle.",
+      "problem": "Web2 subscription churn is dominated by 'forgot to cancel' UX; web3 subscription primitives on Solana are fragmented across Streamflow (vesting), Solana Pay (one-shot), and ad-hoc Squads multisigs.",
+      "solution": "Knot Anchor program registers user-signed delegations (cap, period, beneficiary); merchant calls the pull instruction each cycle; user can cancel from a single wallet UI any time; on-chain audit trail.",
+      "timing": "Solana Pay merchant adoption +40% QoQ (Phantom Commerce Q4 2025) creates merchant demand for recurring rails not currently served.",
+      "tech_stack": [
+        "Anchor v0.30+",
+        "SPL Token (USDC delegated transfer)",
+        "Solana Clock sysvar (period enforcement)",
+        "Next.js + wallet adapters"
+      ],
+      "theme_alignment": {
+        "payments": "STRONG \u2014 Theme #3 payments rails",
+        "stablecoins": "STRONG \u2014 USDC-only settlement",
+        "onchain_yield": "WEAK",
+        "private_defi_infrastructure": "NONE"
+      },
+      "depends_on_named_primitive": false,
+      "primitives": [],
+      "copilot_queries": [
+        "solana subscription payment recurring billing delegation usdc",
+        "solana pay subscription merchant recurring rails consumer"
+      ],
+      "accelerator_only": {
+        "query": "Colosseum accelerator subscription payment recurring usdc consumer",
+        "matches": [],
+        "zero_match_note": "No Colosseum accelerator company is a subscription-payments rail. Helio and Sphere are merchant-side one-shot Solana Pay infrastructure, not consumer-side subscription managers. The consumer subscription manager category is open in the accelerator tier but the 'pure rails' framing is structurally narrow."
+      },
+      "winners_only": {
+        "query": "Colosseum grand prize winner subscription payment recurring",
+        "matches": [],
+        "zero_match_note": "No Colosseum Grand Prize winner is a subscription product. Payment winners (Decal, TypeX) are merchant-side. Knot has no judge-familiar subscription-product anchor in the Colosseum corpus."
+      },
+      "comparable_matches": [
+        {
+          "slug": "streamflow",
+          "url": "https://streamflow.finance",
+          "differentiation": "Streamflow is token vesting and payroll streaming on Solana. Knot is consumer subscription pull (different cardinality: vesting is one-to-many push; subscription is many-to-one pull with consumer cancel control)."
+        },
+        {
+          "slug": "solana-pay",
+          "url": "https://solanapay.com",
+          "differentiation": "Solana Pay is one-shot transfers; Knot is recurring delegated pull. Different protocol shape but Knot integrates Solana Pay receipts for cycle confirmation."
+        },
+        {
+          "slug": "loop-crypto",
+          "url": "https://loopcrypto.xyz",
+          "differentiation": "Loop is a multi-chain crypto subscription rail (EVM + Solana). Knot is Solana-native and consumer-first (wallet-side cancel UI as the differentiator) rather than merchant-first."
+        }
+      ],
+      "weakening_source": {
+        "url": "https://loopcrypto.xyz",
+        "summary": "Loop already offers crypto subscriptions including Solana support with a working merchant SDK and live customers. Knot's wedge of 'consumer-side cancel UX' is real but narrower than a category-creating thesis; risks being framed as a UI veneer over an existing primitive rather than new infrastructure."
+      },
+      "biggest_reason_not_to_build": "Loop Crypto already serves crypto subscriptions including Solana with merchant integrations. Knot's differentiation collapses to wallet-side UX which is hard to defend as a Grand-Prize-level moat.",
+      "scores": {
+        "real_problem": 2,
+        "timing": 2,
+        "buildable": 3,
+        "sponsor_aligned": 2,
+        "differentiated": 1,
+        "founder_insight": 2,
+        "judge_excitement": 1,
+        "expansion_potential": 2
+      }
+    },
+    {
+      "id": "beacon",
+      "name": "Beacon",
+      "category": "Consumer / Verified Reviews",
+      "selected": false,
+      "total_score": 13,
+      "one_liner": "Verified-purchase product reviews backed by Solana Pay receipts; reviewers earn USDC tips from readers; reviews are tied to wallet-signed purchase proofs that cannot be faked.",
+      "problem": "Web2 review platforms (Amazon, Yelp, G2) are gameable; verified-purchase badges are siloed per platform; cross-platform reputation is impossible.",
+      "solution": "Beacon ingests Solana Pay receipts (or merchant-attested cross-chain receipts) and lets the buyer publish a wallet-signed review tied to that receipt; readers tip with USDC; aggregate score is on-chain.",
+      "timing": "Solana Pay merchant volume crossed (claimed metric needs verification \u2014 flagged as weakness) Q4 2025 milestone; consumer wallet base 9M MAU.",
+      "tech_stack": [
+        "Anchor v0.30+",
+        "Solana Pay receipt verification",
+        "SPL Token (USDC tips)",
+        "IPFS via Helius (review text)",
+        "Next.js + wallet adapters"
+      ],
+      "theme_alignment": {
+        "social_markets_consumer_crypto": "MEDIUM \u2014 Theme #12 reviews and reputation",
+        "payments": "WEAK",
+        "onchain_yield": "NONE",
+        "private_defi_infrastructure": "NONE"
+      },
+      "depends_on_named_primitive": false,
+      "primitives": [],
+      "copilot_queries": [
+        "solana verified purchase review reputation on-chain consumer",
+        "solana pay receipt review reputation cross-platform consumer"
+      ],
+      "accelerator_only": {
+        "query": "Colosseum accelerator review reputation verified purchase consumer",
+        "matches": [],
+        "zero_match_note": "No Colosseum accelerator company is a review/reputation product. Category is structurally empty in the accelerator tier but also lacks any prior validating winner."
+      },
+      "winners_only": {
+        "query": "Colosseum grand prize winner review reputation verified purchase",
+        "matches": [],
+        "zero_match_note": "No Colosseum Grand Prize winner is a reviews product. Closest reputation-adjacent winner is Attest (privacy/identity) which is a credentialing primitive rather than a review product. Null result indicates low judge familiarity with the category."
+      },
+      "comparable_matches": [
+        {
+          "slug": "trustpilot",
+          "url": "https://www.trustpilot.com",
+          "differentiation": "Trustpilot is the web2 incumbent for verified-purchase reviews. Beacon adds wallet-signed receipts (uncopyable proof) and on-chain tipping (reviewer monetization). Hard to compete on distribution; easier on trust primitive."
+        },
+        {
+          "slug": "g2-reviews",
+          "url": "https://www.g2.com",
+          "differentiation": "G2 is the B2B SaaS review platform with manual verification. Beacon's wallet-signed proof is structurally stronger but G2's distribution moat is enormous."
+        },
+        {
+          "slug": "lens-protocol",
+          "url": "https://www.lens.xyz",
+          "differentiation": "Lens is a decentralized social graph on Polygon. Beacon overlaps slightly on the reputation-economy space but differs in domain (reviews vs general social) and chain (Solana vs Polygon)."
+        }
+      ],
+      "weakening_source": {
+        "url": "https://www.trustpilot.com",
+        "summary": "Trustpilot's network effect is enormous; cold-starting a reviews platform is a chicken-and-egg problem with no clear hackathon-friendly wedge. Demo cannot show network value in 90 seconds, only the verification primitive in isolation."
+      },
+      "biggest_reason_not_to_build": "Network-effect business with no hackathon-friendly wedge. Demo shows a verified review and a tip; judges see a CRUD app, not category creation. Also: 'merchant-attested cross-chain receipts' is hand-wavy and would trigger R20-style 'asserted not demonstrated' rejection.",
+      "scores": {
+        "real_problem": 2,
+        "timing": 2,
+        "buildable": 2,
+        "sponsor_aligned": 2,
+        "differentiated": 1,
+        "founder_insight": 1,
+        "judge_excitement": 1,
+        "expansion_potential": 2
+      }
+    },
+    {
+      "id": "tempo",
+      "name": "Tempo",
+      "category": "Consumer / On-Chain Tournaments",
+      "selected": false,
+      "total_score": 11,
+      "one_liner": "On-chain rhythm-game tournaments on Solana; entry fees pool into USDC prize pots; verifiable scoring via signed game-server attestations; payout to top-N players atomically.",
+      "problem": "Web2 esports tournaments hold prize pools in escrow with centralized custodians; payout disputes are common and slow.",
+      "solution": "Tempo Anchor program pools entry-fee USDC; game server signs final scoreboard; program distributes pot to top-N wallets atomically.",
+      "timing": "Solana mobile-game adoption (Saga, Seeker) growing; gaming category has CFL and The Arena as Colosseum precedents.",
+      "tech_stack": [
+        "Anchor v0.30+",
+        "SPL Token (USDC)",
+        "Ed25519 signed scoreboard verification",
+        "Next.js + wallet adapters"
+      ],
+      "theme_alignment": {
+        "social_markets_consumer_crypto": "MEDIUM \u2014 Theme #12 consumer gaming",
+        "stablecoins": "MEDIUM \u2014 USDC pots",
+        "onchain_yield": "NONE",
+        "private_defi_infrastructure": "NONE"
+      },
+      "depends_on_named_primitive": false,
+      "primitives": [],
+      "copilot_queries": [
+        "solana on-chain tournament prize pool gaming usdc atomic payout",
+        "solana rhythm game esports prize pot signed scoreboard"
+      ],
+      "accelerator_only": {
+        "query": "Colosseum accelerator esports tournament prize pool consumer gaming",
+        "matches": [],
+        "zero_match_note": "No Colosseum accelerator company is an esports tournament platform. CFL is fantasy sports (different shape); The Arena is social-trading game (different shape). The on-chain tournament category is open in the accelerator tier but lacks judge-familiar anchors."
+      },
+      "winners_only": {
+        "query": "Colosseum grand prize winner gaming tournament prize pool consumer",
+        "matches": [
+          {
+            "slug": "cfl",
+            "url": "https://cfl.gg"
+          }
+        ]
+      },
+      "comparable_matches": [
+        {
+          "slug": "cfl",
+          "url": "https://cfl.gg",
+          "differentiation": "CFL won as Solana fantasy sports. Tempo is rhythm-game tournaments \u2014 different game category and different scoring model (single-player skill vs multi-player draft). Same on-chain prize-pool structural pattern but in an under-served gaming niche."
+        },
+        {
+          "slug": "the-arena",
+          "url": "https://thearena.com",
+          "differentiation": "The Arena is Solana social-trading gamification. Tempo is skill-game tournaments (rhythm, future genres). Different gameplay and different audience (gamers vs traders)."
+        },
+        {
+          "slug": "blast-esports",
+          "url": "https://blast.tv",
+          "differentiation": "BLAST is the dominant web2 esports platform with $100M+ tournament prize pools but custodial USD escrow. Tempo is the on-chain tournament alternative for smaller community-run events; cannot challenge BLAST scale."
+        }
+      ],
+      "weakening_source": {
+        "url": "https://cfl.gg",
+        "summary": "Gaming category requires a fun playable game in addition to the on-chain rails \u2014 building both in 4 weeks is high-risk. Also: signed-scoreboard model is centralization-by-trust which weakens the on-chain-by-design narrative."
+      },
+      "biggest_reason_not_to_build": "Gaming + on-chain is two products in one hackathon timeline. Centralized scoreboard signer reintroduces R17 Surge-style oracle handwaviness. Gaming category has incumbents (CFL won prior, The Arena placed) crowding judge attention.",
+      "scores": {
+        "real_problem": 2,
+        "timing": 1,
+        "buildable": 1,
+        "sponsor_aligned": 1,
+        "differentiated": 1,
+        "founder_insight": 1,
+        "judge_excitement": 2,
+        "expansion_potential": 2
+      }
+    }
+  ]
+}

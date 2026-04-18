@@ -1,0 +1,17 @@
+{
+  "total_files": 26,
+  "total_loc": 3837,
+  "test_files": 4,
+  "test_loc": 82252,
+  "test_ratio": 0.955,
+  "todo_fixme_count": 0,
+  "todo_locations": [],
+  "hardcoded_values": [],
+  "console_log_count": 0,
+  "console_log_locations": [],
+  "error_handling": {
+    "try_catch_blocks": 7,
+    "fetch_without_catch": 0
+  },
+  "dependency_count": 0
+}

@@ -39,6 +39,14 @@ Plaintiff creates dispute → SOL staked in PDA → Defendant joins + stakes
 - **Auto-verdict on 3rd vote:** No separate finalize step; `cast_vote` transitions to Decided
 - **PDA as escrow:** Stakes locked in dispute account, no separate vault
 
+## Feature Budget
+
+| Feature | Size | % of EXECUTION budget | Status |
+|---------|------|----------------------|--------|
+| Anchor dispute program (6 instructions + state machine) | Large | 50% | Complete |
+| React frontend (landing + dispute dashboard + wallet) | Medium | 30% | Complete |
+| VRF integration (Orao CPI + jury reveal) | Small | 20% | Complete |
+
 ## Devnet Deployment
 - Program ID: `4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15`
 - Orao VRF: `VRFzZoJdhFWL8rkvu87LpKM3RbcVezpMEc6X5GVDr7y`

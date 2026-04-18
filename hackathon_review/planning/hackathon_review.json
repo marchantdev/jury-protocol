@@ -1,0 +1,77 @@
+{
+  "review_id": "colosseum-frontier_planning_20260416T143128Z",
+  "packet_id": "colosseum-frontier_planning_20260416T143001Z",
+  "target": "colosseum-frontier",
+  "hackathon_name": "colosseum-frontier",
+  "milestone": "planning",
+  "reviewed_at": "2026-04-16T14:31:28Z",
+  "reviewer": "codex",
+  "runner_identity": "reviewer@autonomous-ai:1261155",
+  "source_hashes_at_review": {
+    "hackathon-requirements.md": "dabf13bf460522401f84a258e054133a901ca1a7892ce51bacd266c9632f28fd",
+    "hackathon-landscape.md": "79df7ea4e24bbc71532c940abf24ca82c9e0d82f6c3b90e2d9811a563ac54553",
+    "idea-candidates.md": "342ea470d39d1b8b812e39d86711874c8e255d4a32f9accae4ecb270321a4e77",
+    "winning-thesis.md": "74966e2631ab6f4826b171c4682175dea2b7c939429c56f140be4c08644f70b7",
+    "idea-candidates.json": "d5b88e4a953282f420939c16090f860f02d092b9619a18609d3abdda15e5e13b"
+  },
+  "stale": false,
+  "verdict": "do_not_proceed",
+  "verdict_reason": "This project is not ready to advance from planning. The harsh problem is not just missing polish; it is missing substance. Pebble is described as a live, replayable, mainnet-ready consumer savings product, but the repo contains no Pebble implementation, no Pebble spike, no Pebble deployment, and no Pebble submission artifacts. Instead, the workspace is still cluttered with older Drip, Jury, and Confidential Balances narratives, which makes the package look like a thesis pivot without corresponding build proof. In a unified Colosseum field, that combination reads as handwavy, non-competitive, and internally inconsistent enough to score poorly.",
+  "angle_evaluations": [
+    {
+      "angle_id": "WEAK_INNOVATION",
+      "severity": "major",
+      "finding": "Pebble's novelty is thinner than claimed because the repo already contains an earlier compressed-yield concept with the same core mechanic: cheap compressed accounts plus Marinade yield. The current plan looks more like a rebrand/reframe than a clearly new category-defining product.",
+      "evidence": "hackathons/frontier/judge-packet.md:7-13 and 26-43 describe \"Drip\" as a compressed-account Marinade yield vault for small deposits; hackathons/frontier/idea-candidates.md:72-85 and hackathons/frontier/winning-thesis.md:6-18 pitch Pebble with the same compressed-savings + Marinade yield core."
+    },
+    {
+      "angle_id": "NON_COMPETITIVE",
+      "severity": "critical",
+      "finding": "The workspace does not contain a Pebble product implementation or even a Pebble scaffold, so this is not competitive in a unified field that rewards shipped code and working products.",
+      "evidence": "find hackathons/frontier -maxdepth 3 only returns planning docs plus the old spike files; the only executable Frontier code is hackathons/frontier/spike.mjs:1-82 and hackathons/frontier/spike-vrf/package.json:1-9 for Jury VRF. There is no Pebble app/program code, no Anchor.toml, no Cargo.toml, no frontend package, and no deployment config under hackathons/frontier."
+    },
+    {
+      "angle_id": "MISALIGNED",
+      "severity": "major",
+      "finding": "The planning package is still misaligned with the actual judging/investor story because supporting materials are anchored to older concepts and conflicting theses, which undermines the claimed focused Pebble narrative.",
+      "evidence": "hackathons/frontier/judge-sponsor-intelligence.md:91-115 still argues the winning thesis is Confidential Balances/private DeFi; hackathons/frontier/judge-packet.md:1-43 is still for Drip; plan-progress.json:2-175 tracks an unrelated Nosana project; meanwhile Pebble claims a focused R21 thesis in hackathons/frontier/winning-thesis.md:1-190."
+    },
+    {
+      "angle_id": "HANDWAVY",
+      "severity": "critical",
+      "finding": "The thesis repeatedly states or implies proof that does not exist in the repo: deployed app, spike-validated flow, tracked milestones, and replayable mainnet demo are all asserted without corresponding artifacts.",
+      "evidence": "hackathons/frontier/winning-thesis.md:80-83 claims a live mainnet deployment and weekly milestones; lines 111-113 say the spike commit is due before planning review; lines 141-143 say pebble.savings is deployed to Vercel and runs on mainnet; yet lines 162-169 simultaneously mark the GitHub repo, videos, deployment URL, README, spike result, and plan-progress as NOT YET. There is no Pebble spike result file, and plan-progress.json:2-175 is for Nosana, not Pebble."
+    }
+  ],
+  "additional_check_results": [
+    {
+      "check_id": "requirements_compliance",
+      "passed": false,
+      "details": "Required submission deliverables are not present for Pebble. The hackathon requires a GitHub repo with hackathon-period code, a pitch video, a technical demo video, and a submission form per hackathons/frontier/hackathon-requirements.md:31-36. Pebble's thesis explicitly marks the public repo, pitch video, demo video, submission form, live deployment URL, README, spike result, and plan-progress artifact as NOT YET in hackathons/frontier/winning-thesis.md:156-176.",
+      "severity_if_failed": "critical"
+    }
+  ],
+  "strengths": [
+    "The Pebble thesis correctly avoids the prior Private DeFi overclaim and explicitly narrows primary fit to Onchain Yield plus a consumer wedge in hackathons/frontier/winning-thesis.md:60-69.",
+    "The concept is at least attached to real live primitives rather than disabled ones: Light Protocol, Marinade, Jupiter, Solana Pay, and Anchor are named concretely in hackathons/frontier/idea-candidates.md:93-101 and hackathons/frontier/winning-thesis.md:131-139."
+  ],
+  "weaknesses": [
+    "There is no Pebble code in the workspace, only planning prose and an old Jury VRF spike.",
+    "The repo tells three different stories at once: Pebble, Drip, and older Confidential Balances/privacy positioning.",
+    "Key claims about deployment, spike validation, and milestone tracking are contradicted by the files themselves.",
+    "Submission-critical artifacts are acknowledged as missing, which is fatal in a no-tracks unified competition."
+  ],
+  "concrete_improvements": [
+    "Build and commit a minimal Pebble end-to-end spike now: deposit, compressed-state creation, yield routing, and withdraw, with reproducible commands and transaction links.",
+    "Delete or archive stale Frontier materials that still pitch Drip, Jury, or Confidential Balances so the active package tells one coherent story.",
+    "Do not claim deployed mainnet flow or tracked milestones until the corresponding Pebble repo, deployment config, and progress file actually exist.",
+    "Create the submission skeleton immediately: public Pebble repo structure, README, demo checklist, and placeholder video scripts tied to the real product flow."
+  ],
+  "blocking_issues": [
+    "No Pebble implementation exists in the repo.",
+    "The planning package is internally inconsistent across Pebble, Drip, Jury, and Confidential Balances materials.",
+    "Required submission artifacts for Pebble are missing.",
+    "Core proof claims are asserted without matching outputs or files."
+  ],
+  "recommended_next_step": "Commit a Pebble-specific technical spike and repo scaffold immediately, then rewrite the planning package to match only what that spike demonstrably proves."
+}
