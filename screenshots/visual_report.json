@@ -1,0 +1,102 @@
+{
+  "url": "https://jury-app-eight.vercel.app",
+  "captured_at": "2026-04-18T07:57:00Z",
+  "visual_score": 8,
+  "screenshots": [
+    {
+      "name": "01-landing-hero.png",
+      "path": "screenshots/01-landing-hero.png",
+      "size_bytes": 75787,
+      "sha256": "ed14816f4bf04b6f"
+    },
+    {
+      "name": "02-how-it-works.png",
+      "path": "screenshots/02-how-it-works.png",
+      "size_bytes": 74825,
+      "sha256": "a1b7e89ac2f11326"
+    },
+    {
+      "name": "03-onchain-proof.png",
+      "path": "screenshots/03-onchain-proof.png",
+      "size_bytes": 72604,
+      "sha256": "d16da4039a4d5a24"
+    },
+    {
+      "name": "03-vrf-evidence.png",
+      "path": "screenshots/03-vrf-evidence.png",
+      "size_bytes": 66136,
+      "sha256": "1811ae40e256ab2f"
+    },
+    {
+      "name": "04-cost-comparison.png",
+      "path": "screenshots/04-cost-comparison.png",
+      "size_bytes": 66136,
+      "sha256": "1811ae40e256ab2f"
+    },
+    {
+      "name": "05-app-dashboard.png",
+      "path": "screenshots/05-app-dashboard.png",
+      "size_bytes": 23074,
+      "sha256": "ede489d02386c5a6"
+    },
+    {
+      "name": "05-onchain-proof.png",
+      "path": "screenshots/05-onchain-proof.png",
+      "size_bytes": 66136,
+      "sha256": "1811ae40e256ab2f"
+    },
+    {
+      "name": "06-app-dashboard.png",
+      "path": "screenshots/06-app-dashboard.png",
+      "size_bytes": 23074,
+      "sha256": "ede489d02386c5a6"
+    },
+    {
+      "name": "disputes.png",
+      "path": "screenshots/disputes.png",
+      "size_bytes": 23142,
+      "sha256": "6e66a4f092521dea"
+    },
+    {
+      "name": "full-landing.png",
+      "path": "screenshots/full-landing.png",
+      "size_bytes": 162154,
+      "sha256": "0db68a110c0de69e"
+    },
+    {
+      "name": "landing.png",
+      "path": "screenshots/landing.png",
+      "size_bytes": 75807,
+      "sha256": "e8bccfb9f816595c"
+    }
+  ],
+  "analysis": {
+    "has_navigation": true,
+    "has_branding": true,
+    "has_professional_layout": true,
+    "has_real_content": true,
+    "no_placeholder_text": true,
+    "has_css_styling": true,
+    "responsive": true,
+    "color_scheme": "dark with green accent (#10b981)",
+    "typography": "Space Grotesk + JetBrains Mono",
+    "sections_found": [
+      "hero",
+      "how-it-works",
+      "vrf-evidence",
+      "cost-comparison",
+      "on-chain-proof",
+      "footer"
+    ],
+    "clickable_paths": [
+      "/",
+      "/app"
+    ],
+    "external_links": [
+      "github.com/marchantdev/jury-protocol",
+      "explorer.solana.com"
+    ]
+  },
+  "issues": [],
+  "verdict": "professional"
+}

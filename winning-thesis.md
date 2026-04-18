@@ -63,7 +63,7 @@ Each transition is gated by status checks and signer verification.
 
 Orao VRF uses a 4-of-4 Byzantine quorum. The client provides a 32-byte seed bound to a one-shot PDA — no retry on the same seed. An observer cannot predict the randomness before aggregation.
 
-**Honest caveat:** The authority set is a known committee, not a fully trustless oracle. JURY provides VRF-backed randomness with a public authority set — stronger than centralized arbitration, weaker than theoretical trustless randomness.
+**Honest caveat:** The authority set is a known committee, not a fully trustless oracle. JURY provides VRF-backed randomness with a public authority set — stronger than centralized arbitration, weaker than theoretical trustless randomness. This is a deliberate tradeoff: Orao's 4-authority quorum gives us sub-3-second jury formation with production-grade security, while a fully decentralized oracle would add minutes of latency and significantly more complexity. For the dispute sizes we're targeting ($5-$500), this security level is appropriate.
 
 ---
 
@@ -116,10 +116,29 @@ Orao VRF uses a 4-of-4 Byzantine quorum. The client provides a 32-byte seed boun
 
 ---
 
-## 8. What We'd Build Next
+## 8. Market Opportunity & Business Case
 
+### Addressable Market
+- **Solana DeFi TVL:** $8B+ with zero dispute infrastructure
+- **Ethereum comp:** Kleros has resolved $50M+ in dispute value since 2019
+- **P2P commerce growth:** Tensor ($200M+ NFT volume), SOL Pay merchants, freelance escrow
+- **Why micro-disputes matter:** Kleros' $50-200 gas floor kills disputes under $500. JURY's ~$0.01 cost makes $5-50 micro-disputes viable — a market segment that doesn't exist yet.
+
+### Revenue Model
+- 2-5% protocol fee on resolved stake amounts
+- At 1,000 disputes/month, $50 avg stake = $12K-30K/year
+- At scale (10K disputes/month): $120K-300K/year
+- No governance token — revenue accrues to protocol, not speculation
+
+### Beachhead Users
+1. **Solana NFT marketplaces** — dispute resolution as a service (Tensor, Magic Eden API integration)
+2. **Freelance escrow dApps** — plug-in arbitration for SOL-denominated gig work
+3. **P2P trading** — OTC desk disputes where both parties want neutral resolution
+
+### What We'd Build Next
 1. Juror reputation system — on-chain voting track record
-2. Multi-round appeals — escalation with larger juries
+2. Multi-round appeals — escalation with larger juries (5-of-15, 7-of-21)
 3. Evidence submission — Arweave-linked dispute evidence
 4. Mainnet deployment (same Orao VRF program ID)
 5. SDK for integrating JURY into any Solana dApp
+6. Juror incentive pool — SOL rewards for participating in dispute resolution
