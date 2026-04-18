@@ -29,8 +29,8 @@
 **Score: 8/10**
 
 ### Evidence
-- File: `jury-program/programs/jury-program/src/lib.rs` (479 lines)
-- 6 instructions, 6-state state machine, 11 error codes, 7 events
+- File: `jury-program/programs/jury-program/src/lib.rs` (527 lines)
+- 7 instructions, 6-state state machine, 11 error codes, 7 events
 
 ### Strengths
 
@@ -57,8 +57,8 @@ Both `create_dispute` and `join_dispute` use `anchor_lang::system_program::trans
 **No timeout / dispute abandonment path.**
 If the defendant never joins, the plaintiff's stake is locked forever. If a juror disappears before voting, the dispute is stuck in `Deliberating` indefinitely. There is no `expire_dispute` or `timeout_vote` instruction. This is a real UX and safety gap for any production usage.
 
-**`reveal_jury` juror pool is caller-supplied (documented, fix designed).**
-`juror_pool: [Pubkey; 9]` is passed in by whoever calls `reveal_jury`. The VRF output deterministically picks 3 indices from this pool, but the pool composition itself is unverified on-chain. This is a known hackathon simplification, documented in README.md "Security Model" section with the pre-mainnet fix: replace with a `JurorPool` PDA (~20-line change). The VRF selection itself — the core cryptographic innovation — is fully on-chain and tamper-proof regardless of pool source.
+**`reveal_jury` juror pool is now on-chain (FIXED).**
+Previously `juror_pool: [Pubkey; 9]` was caller-supplied — a trust model vulnerability. Fixed: added `JurorPool` PDA (`seeds = [b"juror_pool"]`) initialized by admin via `initialize_juror_pool`. `reveal_jury` now reads the pool from on-chain state via Anchor account constraints. Callers cannot supply or manipulate the juror set. Compiles clean (527 LOC, 314KB BPF binary).
 
 **`claim_stakes` does not close the account.**
 After `claim_stakes`, the dispute account remains allocated (rent-paying). The PDA lamports are drained by 2x the stake, but rent lamports remain locked. A `close = winner` constraint on the `ClaimStakes` context would reclaim this.

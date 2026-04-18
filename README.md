@@ -76,7 +76,7 @@ State machine: `Open → AwaitingJury → JuryRequested → Deliberating → Dec
 
 Mean fulfillment: 4.5 slots (~2.5 seconds). Transaction signatures in [`spike-result.md`](spike-result.md).
 
-**Anchor Program:** 479 LOC, 6 instructions, 294KB BPF binary. **Tests:** 5/5 passing.
+**Anchor Program:** 527 LOC, 7 instructions, 314KB BPF binary. **Tests:** 5/5 passing.
 
 ## Architecture
 
@@ -91,10 +91,11 @@ Frontend (React 19/Vite 6)  ──►  JURY Program (Anchor 0.32.1)  ──►  
 
 | Instruction | Description |
 |-------------|-------------|
+| `initialize_juror_pool` | Admin creates on-chain juror pool PDA |
 | `create_dispute` | Plaintiff stakes SOL, creates dispute PDA |
 | `join_dispute` | Defendant matches stake |
 | `request_jury` | Triggers Orao VRF CPI for randomness |
-| `reveal_jury` | Reads VRF output, selects 3-of-9 jurors |
+| `reveal_jury` | Reads VRF output + on-chain pool, selects 3-of-9 jurors |
 | `cast_vote` | Juror votes (plaintiff or defendant) |
 | `claim_stakes` | Winner withdraws both stakes |
 
@@ -142,10 +143,9 @@ npm run dev   # http://localhost:5173
 - **Randomness:** Orao VRF with 4-authority Byzantine quorum. No single authority can predict or bias the output. Verifiable on-chain via fulfilled randomness account.
 - **Selection algorithm:** `randomness[i] % pool_size` with deduplication loop (up to 64 bytes consumed). Deterministic — anyone can verify the same randomness produces the same jury.
 
-### Current Limitations (Devnet)
-- **Juror pool is caller-supplied in `reveal_jury`:** The current implementation accepts `juror_pool: [Pubkey; 9]` as an instruction argument. This is a known hackathon simplification.
-- **Production fix (pre-mainnet):** Replace with a `JurorPool` PDA initialized by protocol admin. `reveal_jury` reads the pool from on-chain state, not caller input. This is a ~20-line change that does not affect the VRF selection logic.
-- **Why it doesn't undermine the demo:** On devnet, the pool is hardcoded in the frontend. The VRF selection itself — the cryptographic innovation — is fully on-chain and tamper-proof regardless of pool source.
+### On-Chain Juror Pool (Trust Model)
+- **`JurorPool` PDA:** Juror addresses are stored on-chain in a protocol-admin-initialized PDA (`seeds = [b"juror_pool"]`). The `reveal_jury` instruction reads the pool from this PDA — callers cannot supply or manipulate the juror set.
+- **`initialize_juror_pool` instruction:** Admin creates the pool once; `reveal_jury` references it via Anchor account constraints. The VRF selection algorithm is unchanged — the fix only moves the pool from an instruction argument to verified on-chain state.
 
 ### Signer Checks
 - Only the plaintiff can create a dispute

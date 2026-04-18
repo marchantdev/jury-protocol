@@ -7,6 +7,7 @@ use orao_solana_vrf::RANDOMNESS_ACCOUNT_SEED;
 declare_id!("4hFoUmi8NQnMS8icdTZWnP1wzYrDTpph4qTUjGCsjv15");
 
 pub const DISPUTE_SEED: &[u8] = b"dispute";
+pub const JUROR_POOL_SEED: &[u8] = b"juror_pool";
 pub const JURY_POOL_SIZE: u8 = 9;
 pub const JURY_SIZE: u8 = 3;
 
@@ -122,14 +123,29 @@ pub mod jury_program {
         Ok(())
     }
 
+    /// Initialize the on-chain juror pool. Only the admin can set the pool.
+    /// This replaces the previous caller-supplied pool, fixing the trust model.
+    pub fn initialize_juror_pool(
+        ctx: Context<InitializeJurorPool>,
+        jurors: [Pubkey; 9],
+    ) -> Result<()> {
+        let pool = &mut ctx.accounts.juror_pool;
+        pool.admin = ctx.accounts.admin.key();
+        pool.jurors = jurors;
+        pool.bump = ctx.bumps.juror_pool;
+
+        Ok(())
+    }
+
     /// Reveal the jury after VRF fulfillment.
+    /// Reads juror pool from on-chain PDA — not caller-supplied.
     pub fn reveal_jury(
         ctx: Context<RevealJury>,
-        juror_pool: [Pubkey; 9],
     ) -> Result<()> {
         let dispute = &mut ctx.accounts.dispute;
         require!(dispute.status == DisputeStatus::JuryRequested, JuryError::InvalidStatus);
 
+        let juror_pool = &ctx.accounts.juror_pool;
         let random_data = &ctx.accounts.random;
         let randomness = get_fulfilled_randomness(random_data)?;
 
@@ -154,9 +170,9 @@ pub mod jury_program {
         require!(count == 3, JuryError::InsufficientRandomness);
 
         dispute.jury = [
-            juror_pool[selected[0] as usize],
-            juror_pool[selected[1] as usize],
-            juror_pool[selected[2] as usize],
+            juror_pool.jurors[selected[0] as usize],
+            juror_pool.jurors[selected[1] as usize],
+            juror_pool.jurors[selected[2] as usize],
         ];
         dispute.status = DisputeStatus::Deliberating;
 
@@ -311,6 +327,21 @@ pub struct RequestJury<'info> {
 }
 
 #[derive(Accounts)]
+pub struct InitializeJurorPool<'info> {
+    #[account(mut)]
+    pub admin: Signer<'info>,
+    #[account(
+        init,
+        payer = admin,
+        space = 8 + JurorPool::SIZE,
+        seeds = [JUROR_POOL_SEED],
+        bump,
+    )]
+    pub juror_pool: Account<'info, JurorPool>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct RevealJury<'info> {
     #[account(
         mut,
@@ -318,6 +349,11 @@ pub struct RevealJury<'info> {
         bump = dispute.bump,
     )]
     pub dispute: Account<'info, Dispute>,
+    #[account(
+        seeds = [JUROR_POOL_SEED],
+        bump = juror_pool.bump,
+    )]
+    pub juror_pool: Account<'info, JurorPool>,
     /// CHECK: Orao VRF randomness (fulfilled)
     #[account(
         seeds = [RANDOMNESS_ACCOUNT_SEED, dispute.vrf_seed.as_ref()],
@@ -370,6 +406,19 @@ pub struct Dispute {
 
 impl Dispute {
     pub const SIZE: usize = 32 + 32 + 32 + (4 + 256) + 8 + 1 + (32 * 3) + 3 + 32 + 1 + 8 + 1;
+}
+
+/// On-chain juror pool — stores registered juror addresses.
+/// Initialized by admin, read by reveal_jury. Replaces caller-supplied pool.
+#[account]
+pub struct JurorPool {
+    pub admin: Pubkey,
+    pub jurors: [Pubkey; 9],
+    pub bump: u8,
+}
+
+impl JurorPool {
+    pub const SIZE: usize = 32 + (32 * 9) + 1; // admin + 9 jurors + bump
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
