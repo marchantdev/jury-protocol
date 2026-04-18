@@ -118,10 +118,11 @@ Protocol fee (3%) on resolved disputes. Revenue scales with partner transaction 
 
 | Milestone | Disputes/mo | Avg stake | Annual revenue |
 |-----------|------------|-----------|---------------|
-| Pre-integration | 200 | $50 | $3,600 |
-| 1 marketplace | 2,000 | $150 | $108,000 |
-| 3 integrations | 10,000 | $200 | $720,000 |
-| Standard infra | 50,000 | $250 | $4,500,000 |
+| Launch (standalone) | 50-200 | $50 | $900-$3,600 |
+| First integration | 500-2,000 | $100 | $18,000-$72,000 |
+| Multiple integrations | 5,000+ | $150 | $270,000+ |
+
+Revenue scales with partner volume, not JURY user acquisition — the CPI model means each integration multiplies throughput.
 
 ## Running Locally
 
@@ -183,10 +184,10 @@ Pre-seeded pool of 9 juror addresses. VRF derives 3 unique juror indices via `ra
 
 | Month | Milestone |
 |-------|-----------|
-| 1 | Mainnet deployment + Realms governance plugin |
-| 2 | TypeScript SDK + Tensor marketplace integration |
-| 3 | Juror reputation system + Superteam Earn integration |
-| 6 | 3+ integrations, $30K+ MRR from protocol fees |
+| 1 | Mainnet deployment + TypeScript SDK |
+| 2 | First marketplace integration outreach |
+| 3 | Dynamic juror registry + reputation system |
+| 6 | Multiple integrations, protocol fee revenue |
 
 ## Video
 
