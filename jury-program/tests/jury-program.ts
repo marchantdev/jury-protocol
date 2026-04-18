@@ -15,6 +15,9 @@ describe("jury-program", () => {
   const disputeId = crypto.randomBytes(32);
   const stakeAmount = 0.1 * LAMPORTS_PER_SOL;
 
+  // Generate 9 juror keypairs for the pool
+  const jurors = Array.from({ length: 9 }, () => Keypair.generate());
+
   before(async () => {
     // Fund test wallets
     const sig1 = await provider.connection.requestAirdrop(
@@ -28,6 +31,33 @@ describe("jury-program", () => {
       2 * LAMPORTS_PER_SOL
     );
     await provider.connection.confirmTransaction(sig2);
+  });
+
+  it("initializes the juror pool", async () => {
+    const [jurorPoolPDA] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("juror_pool")],
+      program.programId
+    );
+
+    await program.methods
+      .initializeJurorPool(jurors.map((j) => j.publicKey))
+      .accounts({
+        admin: provider.wallet.publicKey,
+        jurorPool: jurorPoolPDA,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    const pool = await program.account.jurorPool.fetch(jurorPoolPDA);
+    expect(pool.admin.toBase58()).to.equal(
+      provider.wallet.publicKey.toBase58()
+    );
+    expect(pool.jurors.length).to.equal(9);
+    for (let i = 0; i < 9; i++) {
+      expect(pool.jurors[i].toBase58()).to.equal(
+        jurors[i].publicKey.toBase58()
+      );
+    }
   });
 
   it("creates a dispute", async () => {
