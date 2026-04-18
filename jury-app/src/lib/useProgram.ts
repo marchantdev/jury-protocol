@@ -3,7 +3,7 @@ import { useConnection, useAnchorWallet } from "@solana/wallet-adapter-react";
 import { Program, AnchorProvider, BN } from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import IDL from "./idl.json";
-import { PROGRAM_ID, DISPUTE_SEED } from "./program";
+import { PROGRAM_ID, DISPUTE_SEED, getJurorPoolPDA } from "./program";
 
 // Anchor 0.30+ IDL type
 type JuryProgram = any;
@@ -169,17 +169,36 @@ export async function requestJuryTx(
   return sig as string;
 }
 
+export async function initializeJurorPoolTx(
+  program: Program<JuryProgram>,
+  admin: PublicKey,
+  jurors: PublicKey[]
+): Promise<string> {
+  const [jurorPoolPDA] = getJurorPoolPDA();
+  const sig = await (program.methods as any)
+    .initializeJurorPool(jurors)
+    .accounts({
+      admin,
+      jurorPool: jurorPoolPDA,
+      systemProgram: SystemProgram.programId,
+    })
+    .rpc();
+  return sig as string;
+}
+
 export async function revealJuryTx(
   program: Program<JuryProgram>,
   dispute: DisputeAccount
 ): Promise<string> {
   const vrfSeed = new Uint8Array(dispute.vrfSeed);
   const random = getOraoRandomnessPDA(vrfSeed);
+  const [jurorPoolPDA] = getJurorPoolPDA();
 
   const sig = await (program.methods as any)
-    .revealJury(DEVNET_JUROR_POOL)
+    .revealJury()
     .accounts({
       dispute: dispute.publicKey,
+      jurorPool: jurorPoolPDA,
       random,
     })
     .rpc();

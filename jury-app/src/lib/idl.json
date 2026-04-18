@@ -195,6 +195,68 @@
       ]
     },
     {
+      "name": "initialize_juror_pool",
+      "docs": [
+        "Initialize the on-chain juror pool. Only the admin can set the pool.",
+        "This replaces the previous caller-supplied pool, fixing the trust model."
+      ],
+      "discriminator": [
+        243,
+        114,
+        18,
+        234,
+        176,
+        48,
+        250,
+        226
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "juror_pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  106,
+                  117,
+                  114,
+                  111,
+                  114,
+                  95,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "jurors",
+          "type": {
+            "array": [
+              "pubkey",
+              9
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "join_dispute",
       "docs": [
         "Defendant joins the dispute and stakes matching SOL."
@@ -492,7 +554,8 @@
     {
       "name": "reveal_jury",
       "docs": [
-        "Reveal the jury after VRF fulfillment."
+        "Reveal the jury after VRF fulfillment.",
+        "Reads juror pool from on-chain PDA — not caller-supplied."
       ],
       "discriminator": [
         162,
@@ -531,6 +594,28 @@
                 "kind": "account",
                 "path": "dispute.id",
                 "account": "Dispute"
+              }
+            ]
+          }
+        },
+        {
+          "name": "juror_pool",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  106,
+                  117,
+                  114,
+                  111,
+                  114,
+                  95,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
               }
             ]
           }
@@ -617,17 +702,7 @@
           }
         }
       ],
-      "args": [
-        {
-          "name": "juror_pool",
-          "type": {
-            "array": [
-              "pubkey",
-              9
-            ]
-          }
-        }
-      ]
+      "args": []
     }
   ],
   "accounts": [
@@ -642,6 +717,19 @@
         36,
         241,
         74
+      ]
+    },
+    {
+      "name": "JurorPool",
+      "discriminator": [
+        217,
+        104,
+        42,
+        167,
+        209,
+        1,
+        171,
+        33
       ]
     },
     {
@@ -957,6 +1045,35 @@
           },
           {
             "name": "Claimed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "JurorPool",
+      "docs": [
+        "On-chain juror pool — stores registered juror addresses.",
+        "Initialized by admin, read by reveal_jury. Replaces caller-supplied pool."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "jurors",
+            "type": {
+              "array": [
+                "pubkey",
+                9
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }

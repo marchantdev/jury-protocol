@@ -5,6 +5,14 @@ export const PROGRAM_ID = new PublicKey(
 );
 
 export const DISPUTE_SEED = Buffer.from("dispute");
+export const JUROR_POOL_SEED = Buffer.from("juror_pool");
+
+export function getJurorPoolPDA(): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [JUROR_POOL_SEED],
+    PROGRAM_ID
+  );
+}
 
 export function getDisputePDA(
   plaintiff: PublicKey,
