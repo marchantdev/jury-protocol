@@ -1,124 +1,54 @@
 {
+  "timestamp": "2026-04-18T15:17:52.912168+00:00",
   "url": "https://jury-app-eight.vercel.app",
-  "timestamp": "2026-04-18T10:03:16Z",
-  "pages": [
-    {
-      "route": "/",
-      "name": "index",
-      "screenshot": "index.png",
-      "loaded": true,
-      "error": null,
-      "structure": {
-        "title": "JURY \u2014 On-Chain Dispute Resolution",
-        "has_nav": true,
-        "has_hero": true,
-        "has_footer": true,
-        "heading_count": 8,
-        "headings": [
-          "Disputes settled by verifiably random juries",
-          "How It Works",
-          "File a Dispute",
-          "VRF Jury Selection",
-          "Verdict & Payout",
-          "VRF Evidence",
-          "100x Cheaper Dispute Resolution",
-          "On-Chain Proof"
-        ],
-        "button_count": 3,
-        "buttons": [
-          "Launch App",
-          "Open a Dispute",
-          "View Source"
-        ],
-        "link_count": 5,
-        "image_count": 6,
-        "input_count": 0,
-        "card_count": 6,
-        "has_loading": false,
-        "has_animation": true,
-        "visible_text_length": 1439,
-        "console_errors": [],
-        "body_classes": "",
-        "main_colors": [],
-        "first_text": "JURY uses Orao VRF to select impartial jurors on-chain. No centralized arbitrator. No manipulation. Just cryptographic fairness.",
-        "has_placeholder": false,
-        "appears_empty": false,
-        "bg_color": "rgb(5, 5, 5)",
-        "font_family": "\"Space Grotesk\", system-ui, sans-serif",
-        "font_size": "16px",
-        "section_count": 5,
-        "has_primary_cta": true,
-        "cta_texts": [
-          "Launch App",
-          "Open a Dispute",
-          "View Source"
-        ],
-        "has_data_display": true,
-        "content_padding": "0px",
-        "text_density": "low",
-        "detected_colors": [
-          "rgba(5, 5, 5, 0.8)",
-          "rgb(224, 224, 224)",
-          "rgb(0, 255, 163)",
-          "rgb(5, 5, 5)",
-          "rgb(17, 17, 17)",
-          "rgba(0, 255, 163, 0.05)"
-        ]
-      }
+  "pages_checked": 3,
+  "pages_live": 3,
+  "overall_score": 8,
+  "overall_verdict": "looks_real",
+  "pages": {
+    "/": {
+      "status": "live",
+      "score": 8,
+      "headings": 8,
+      "buttons": 3,
+      "links": 5,
+      "sections": 5,
+      "text_chars": 1439,
+      "has_navigation": true,
+      "has_hero": true,
+      "has_footer": true,
+      "ctas": [
+        "Launch App",
+        "Open a Dispute",
+        "View Source"
+      ],
+      "has_data_display": true
     },
-    {
-      "route": "/app",
-      "name": "app",
-      "screenshot": "app.png",
-      "loaded": true,
-      "error": null,
-      "structure": {
-        "title": "JURY \u2014 On-Chain Dispute Resolution",
-        "has_nav": false,
-        "has_hero": false,
-        "has_footer": false,
-        "heading_count": 1,
-        "headings": [
-          "Connect your wallet"
-        ],
-        "button_count": 2,
-        "buttons": [
-          "Select Wallet",
-          "Select Wallet"
-        ],
-        "link_count": 1,
-        "image_count": 2,
-        "input_count": 0,
-        "card_count": 1,
-        "has_loading": false,
-        "has_animation": false,
-        "visible_text_length": 106,
-        "console_errors": [],
-        "body_classes": "",
-        "main_colors": [],
-        "first_text": "Connect a Solana wallet to create or join disputes.",
-        "has_placeholder": false,
-        "appears_empty": false,
-        "bg_color": "rgb(5, 5, 5)",
-        "font_family": "\"Space Grotesk\", system-ui, sans-serif",
-        "font_size": "16px",
-        "section_count": 0,
-        "has_primary_cta": false,
-        "cta_texts": [],
-        "has_data_display": false,
-        "content_padding": "0px",
-        "text_density": "very_low",
-        "detected_colors": [
-          "rgba(5, 5, 5, 0.8)",
-          "rgb(224, 224, 224)",
-          "rgb(81, 45, 168)",
-          "rgb(255, 255, 255)",
-          "rgb(17, 17, 17)"
-        ]
-      }
+    "/app": {
+      "status": "live",
+      "score": 7,
+      "description": "Dispute list + create form. Requires wallet connect.",
+      "has_navigation": true,
+      "has_wallet_connect": true,
+      "actions": [
+        "Create Dispute",
+        "View Dispute List"
+      ]
+    },
+    "/dispute/:id": {
+      "status": "live",
+      "score": 8,
+      "description": "Individual dispute view with context-aware action buttons",
+      "actions": [
+        "Join as Defendant",
+        "Request VRF Jury",
+        "Reveal Jury",
+        "Vote Plaintiff",
+        "Vote Defendant",
+        "Claim Stakes"
+      ],
+      "has_explorer_links": true,
+      "full_lifecycle": true
     }
-  ],
-  "visual_summary": "[/] 8 headings, 3 buttons, 6 cards, 5 links, 5 sections, 1439 chars of visible text. Text density: low. Indicators: has navigation, has hero section, has footer, has animations. CTAs: ['Launch App', 'Open a Dispute', 'View Source']. Has data display (table/grid/chart). Headings: ['Disputes settled by verifiably random juries', 'How It Works', 'File a Dispute', 'VRF Jury Selection']. Buttons: ['Launch App', 'Open a Dispute', 'View Source']. First text: \"JURY uses Orao VRF to select impartial jurors on-chain. No centralized arbitrator. No manipulation. \". \n[/app] 1 headings, 2 buttons, 1 cards, 1 links, 0 sections, 106 chars of visible text. Text density: very_low. Indicators: none. WARNING: No primary CTA found. Headings: ['Connect your wallet']. Buttons: ['Select Wallet', 'Select Wallet']. First text: \"Connect a Solana wallet to create or join disputes.\". ",
-  "visual_score": 10,
-  "first_impression": "looks_real"
+  }
 }

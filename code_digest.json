@@ -1,6 +1,6 @@
 {
   "total_files": 10,
-  "total_loc": 932,
+  "total_loc": 1205,
   "test_files": 0,
   "test_loc": 0,
   "test_ratio": 0.0,
@@ -10,7 +10,7 @@
   "console_log_count": 0,
   "console_log_locations": [],
   "error_handling": {
-    "try_catch_blocks": 4,
+    "try_catch_blocks": 5,
     "fetch_without_catch": 0
   },
   "dependency_count": 11
